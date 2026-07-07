@@ -15,6 +15,7 @@
     return cls.includes('repo') || cls.includes('technology') || cls.includes('portfolio') || text.includes('open-source') || text.includes('tecnologia') || text.includes('curso') || text.includes('projeto');
   }
   function addActions(){
+    if((window.GONE_SUITE||{}).MODE==='gone-only') return;
     if(document.getElementById('gone-repo-bridge-style')) return;
     const style=document.createElement('style'); style.id='gone-repo-bridge-style';
     style.textContent=`.gone-repo-actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}.gone-repo-actions a{font-family:Inter,system-ui,Arial,sans-serif;text-decoration:none;border-radius:999px;padding:7px 10px;font-size:12px;font-weight:800;border:1px solid rgba(6,58,100,.18);background:rgba(255,255,255,.82);color:#063a64;box-shadow:0 4px 12px rgba(0,0,0,.08)}.gone-repo-actions a:hover{background:#063a64;color:#fff}`;

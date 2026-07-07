@@ -11,6 +11,17 @@
     };
     return;
   }
+  // Portal único em domínio raiz (ex.: globaltecone.tech) — sem AVA/ERP/TECA por hora
+  var goneOnlyHosts = ['globaltecone.tech', 'www.globaltecone.tech'];
+  if (goneOnlyHosts.indexOf(host) !== -1) {
+    window.GONE_SUITE = {
+      ERP_URL: null,
+      AVA_URL: null,
+      TECA_URL: null,
+      MODE: 'gone-only'
+    };
+    return;
+  }
   var root = host.replace(/^one\./,'').replace(/^g-one\./,'');
   window.GONE_SUITE = {
     ERP_URL: protocol + '//erp.' + root,

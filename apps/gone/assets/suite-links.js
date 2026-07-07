@@ -1,6 +1,7 @@
 (function(){
   function addSuiteLinks(){
     var cfg = window.GONE_SUITE || {};
+    if (cfg.MODE === 'gone-only' || (!cfg.ERP_URL && !cfg.AVA_URL && !cfg.TECA_URL)) return;
     var erp = cfg.ERP_URL || '/erp';
     var ava = cfg.AVA_URL || '/ava';
     var teca = cfg.TECA_URL || '/teca';

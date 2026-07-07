@@ -4,6 +4,9 @@ local:
 prod:
 	bash scripts/start_prod.sh
 
+gone-only:
+	bash scripts/start_gone_only.sh
+
 prepare-env:
 	bash scripts/prepare_env.sh
 
