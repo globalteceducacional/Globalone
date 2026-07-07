@@ -1,0 +1,211 @@
+/* G.One — ajustes de responsividade mobile/tablet */
+
+@media (max-width: 1180px) {
+  .main {
+    padding: 16px;
+  }
+  .card {
+    padding: 18px;
+    margin-bottom: 14px;
+  }
+}
+
+@media (max-width: 760px) {
+  .onboard {
+    padding: 0;
+    align-items: flex-end;
+  }
+
+  .onboard-card {
+    width: 100%;
+    max-height: 96vh;
+    border-radius: 22px 22px 0 0;
+    overflow: hidden;
+  }
+
+  .onboard-art {
+    min-height: 180px;
+    max-height: 34vh;
+  }
+
+  .onboard-copy {
+    padding: 16px 18px 22px;
+    overflow-y: auto;
+    max-height: 58vh;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .onboard-copy h2 {
+    font-size: 1.28rem;
+    line-height: 1.25;
+    margin: 8px 0;
+  }
+
+  .onboard-copy p.muted {
+    font-size: 14px;
+    line-height: 1.45;
+  }
+
+  .onboard-copy .actions {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+    margin-top: 12px;
+  }
+
+  .onboard-copy .actions .btn {
+    width: 100%;
+    min-height: 44px;
+  }
+
+  .onboard-copy label {
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .modal {
+    padding: 10px;
+    align-items: flex-end;
+  }
+
+  .modal-card {
+    width: 100%;
+    max-height: 94vh;
+    border-radius: 20px 20px 0 0;
+    padding: 16px;
+  }
+
+  .modal-head h2 {
+    font-size: 1.1rem;
+  }
+
+  .login {
+    padding: 16px;
+  }
+
+  .login-card {
+    padding: 20px;
+    border-radius: 22px;
+  }
+
+  .login h1 {
+    font-size: 26px;
+  }
+
+  .login-logos img {
+    height: 46px;
+  }
+
+  .hero-main h1 {
+    font-size: clamp(28px, 8vw, 44px) !important;
+  }
+
+  .hero-main p {
+    font-size: 15px;
+  }
+
+  .teca {
+    right: 12px;
+    bottom: 12px;
+  }
+
+  .teca-fab {
+    width: 56px;
+    height: 56px;
+    font-size: 14px;
+  }
+
+  .teca-panel {
+    right: 0;
+    bottom: 70px;
+    width: min(360px, calc(100vw - 20px));
+    height: min(520px, calc(100vh - 100px));
+  }
+
+  .footer {
+    padding: 14px 12px;
+    font-size: 12px;
+  }
+
+  #gone-editor-modal {
+    padding: 10px;
+    align-items: flex-end;
+  }
+
+  #gone-editor-modal .box {
+    width: 100%;
+    max-height: 92vh;
+    border-radius: 18px 18px 0 0;
+    padding: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .gone-editor-config-btn .gone-editor-config-label {
+    display: none;
+  }
+
+  .gone-editor-config-btn {
+    width: 46px;
+    height: 46px;
+    padding: 0;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+  }
+
+  .gone-editor-drag-hint {
+    display: none;
+  }
+}
+
+/* Painel do editor — posição controlada por JS (arrastável) */
+#gone-editor-panel {
+  position: fixed;
+  z-index: 2147483000;
+  touch-action: none;
+  max-width: calc(100vw - 16px);
+}
+
+#gone-editor-panel.is-dragging {
+  opacity: 0.92;
+  cursor: grabbing;
+}
+
+.gone-editor-config-btn {
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.gone-editor-config-btn:active {
+  cursor: grabbing;
+}
+
+.gone-editor-drag-hint {
+  display: block;
+  font-size: 10px;
+  color: #94a3b8;
+  margin-top: 4px;
+  text-align: center;
+  font-weight: 600;
+}
+
+.gone-editor-dropdown {
+  position: absolute;
+  left: 0;
+  top: calc(100% + 8px);
+  width: min(280px, calc(100vw - 24px));
+  max-height: min(70vh, 420px);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+@media (max-width: 760px) {
+  .gone-editor-dropdown {
+    left: auto;
+    right: 0;
+  }
+}
