@@ -1,0 +1,49 @@
+{
+  email {$LETSENCRYPT_EMAIL}
+}
+
+{$GONE_DOMAIN} {
+  encode gzip zstd
+  reverse_proxy gone:80
+}
+
+{$ERP_DOMAIN} {
+  encode gzip zstd
+
+  handle_path /api/* {
+    reverse_proxy erp-backend:3001
+  }
+
+  handle /uploads* {
+    reverse_proxy erp-backend:3001
+  }
+
+  handle /uploads-protegido* {
+    reverse_proxy erp-backend:3001
+  }
+
+  handle {
+    reverse_proxy erp-frontend:80
+  }
+}
+
+{$AVA_DOMAIN} {
+  encode gzip zstd
+  request_body {
+    max_size 2100MB
+  }
+  reverse_proxy ava-moodle:80
+}
+
+
+{$TECA_DOMAIN} {
+  encode gzip zstd
+
+  handle_path /api/* {
+    reverse_proxy teca-api:3002
+  }
+
+  handle {
+    reverse_proxy teca-web:80
+  }
+}

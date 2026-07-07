@@ -1,32 +1,26 @@
 #!/usr/bin/env bash
 set -euo pipefail
+
 if [ ! -f .env ]; then
-  echo "Arquivo .env não encontrado. Rode: bash scripts/prepare_env.sh e edite domínios/senhas."
+  echo "Arquivo .env não encontrado. Rode: bash scripts/prepare_env.sh"
   exit 1
 fi
 
-if grep -q 'seudominio.com.br' .env; then
-  echo "ATENÇÃO: .env ainda usa seudominio.com.br. Edite GONE_DOMAIN, AVA_DOMAIN, ERP_DOMAIN e TECA_DOMAIN antes de produção."
-  echo "Exemplo: nano .env"
-  exit 1
-fi
-
-if grep -q 'troque_por' .env; then
-  echo "ATENÇÃO: .env ainda possui senhas padrão. Rode scripts/prepare_env.sh ou edite manualmente."
+if grep -qE 'seudominio\.com\.br|seu-email@' .env; then
+  echo "Edite o .env com domínio e e-mail reais: nano .env"
   exit 1
 fi
 
 docker compose up -d --build
+
+GONE_DOMAIN="$(grep '^GONE_DOMAIN=' .env | cut -d= -f2-)"
+
 cat <<MSG
 
-Plataforma iniciada em PRODUÇÃO.
+G.One Portal iniciado em PRODUÇÃO.
 
-Acesse:
-- https://$(grep '^GONE_DOMAIN=' .env | cut -d= -f2-)
-- https://$(grep '^AVA_DOMAIN=' .env | cut -d= -f2-)
-- https://$(grep '^ERP_DOMAIN=' .env | cut -d= -f2-)
-- https://$(grep '^TECA_DOMAIN=' .env | cut -d= -f2-)
+Acesse: https://${GONE_DOMAIN}
 
-Verifique certificados/saúde com: bash scripts/status.sh
-Logs: bash scripts/logs.sh
+Status: bash scripts/status.sh
+Logs:   bash scripts/logs.sh
 MSG

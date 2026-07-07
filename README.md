@@ -1,39 +1,41 @@
-# G.One Suite Completa + Teca.ia — pacote pronto para rodar v1.2
+# G.One Portal — pacote pronto para rodar v1.3
 
-Este pacote instala em Docker: G.One Portal, AVA/Moodle, ERP Globaltec, Teca.ia Web/API e Caddy Gateway com HTTPS automático.
+Por padrão sobe **somente o portal G.One** (ex.: `globaltecone.tech`). AVA, ERP e TECA são opcionais.
 
-## Teste local rápido
+## Teste local rápido (só portal)
 
 ```bash
-unzip GONE_SUITE_COMPLETA_DOCKER_TECA_PRONTA_v1_2.zip
-cd GONE_SUITE_COMPLETA_DOCKER_TECA_PRONTA_v1_2
 bash scripts/start_local.sh
 ```
 
-Abra:
+Abra: **http://localhost:8080**
 
-```txt
-G.One:    http://localhost:8080
-AVA:      http://localhost:8081
-ERP:      http://localhost:5174
-TECA.IA:  http://localhost:8083
-```
+## Produção na VPS (só portal)
 
-## Publicar online em VPS
+DNS tipo A: `globaltecone.tech` → IP da VPS
 
 ```bash
 cd /opt
-unzip GONE_SUITE_COMPLETA_DOCKER_TECA_PRONTA_v1_2.zip
-cd GONE_SUITE_COMPLETA_DOCKER_TECA_PRONTA_v1_2
+git clone https://github.com/globalteceducacional/Globalone.git
+cd Globalone
 bash scripts/install_ubuntu_vps.sh
-rm -f .env
 bash scripts/prepare_env.sh
 nano .env
 bash scripts/doctor.sh
 bash scripts/start_prod.sh
 ```
 
-Antes, aponte os DNS `one`, `ava`, `erp` e `teca` para a VPS.
+Acesse: **https://globaltecone.tech**
+
+## Suite completa (AVA + ERP + TECA) — opcional
+
+Quando tiver os subdomínios `ava`, `erp` e `teca`:
+
+```bash
+bash scripts/prepare_env_full.sh
+nano .env
+bash scripts/start_full.sh
+```
 
 ## Documentação
 
