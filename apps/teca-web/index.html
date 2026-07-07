@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Teca.ia | Globaltec One</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="orb">T</div>
+        <div><b>Teca.ia</b><span>Assistente Globaltec One</span></div>
+      </div>
+      <nav>
+        <a id="linkGone" href="#" target="_blank">🏛️ G.One</a>
+        <a id="linkAva" href="#" target="_blank">🎓 AVA</a>
+        <a id="linkErp" href="#" target="_blank">📁 ERP</a>
+      </nav>
+      <div class="status" id="statusBox">Conectando...</div>
+      <button class="ghost" id="logoutBtn">Sair</button>
+    </aside>
+
+    <main>
+      <section id="loginView" class="login-card">
+        <h1>Entrar na Teca.ia</h1>
+        <p>Acesse a assistente de IA educacional com modos de voz, explicativo e matemática.</p>
+        <label>E-mail</label>
+        <input id="email" value="admin@teca.local" />
+        <label>Senha</label>
+        <input id="password" type="password" value="admin123456" />
+        <div class="actions">
+          <button id="loginBtn">Entrar</button>
+          <button class="secondary" id="registerBtn">Criar usuário aluno</button>
+        </div>
+        <small>Altere o usuário admin no arquivo <code>.env</code> da suite antes de publicar comercialmente.</small>
+      </section>
+
+      <section id="chatView" class="chat hidden">
+        <header class="chat-head">
+          <div>
+            <h1>Teca.ia</h1>
+            <p id="userInfo">Assistente online</p>
+          </div>
+          <div class="modes">
+            <button data-mode="voz" class="active">🎤 Voz</button>
+            <button data-mode="explicativo">📚 Explicativo</button>
+            <button data-mode="matematica">🧮 Matemática</button>
+          </div>
+        </header>
+        <div id="messages" class="messages"></div>
+        <div class="composer">
+          <input id="messageInput" placeholder="Digite sua pergunta para a TECA..." />
+          <button id="sendBtn">Enviar</button>
+        </div>
+        <div class="hints">
+          <button data-prompt="Como transformo uma tecnologia do repositório em projeto no ERP?">Gerar projeto</button>
+          <button data-prompt="Como criar uma trilha de curso no AVA para robótica humanoide?">Gerar curso</button>
+          <button data-prompt="Explique como registrar evidências no ERP com fotos e relatórios.">Evidências</button>
+        </div>
+      </section>
+    </main>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>

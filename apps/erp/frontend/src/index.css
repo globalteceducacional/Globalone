@@ -1,0 +1,68 @@
+@import 'github-markdown-css/github-markdown-dark.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+body {
+  @apply bg-neutral text-white min-h-screen;
+  font-family: 'Montserrat', sans-serif;
+}
+
+button {
+  @apply transition-colors duration-200;
+}
+
+/* Animações para Toast */
+@keyframes slide-in-from-right {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.animate-in {
+  animation: slide-in-from-right 0.3s ease-out;
+}
+
+/* Visualizador global — Markdown (estilo GitHub dark) */
+.file-markdown-github {
+  box-sizing: border-box;
+  min-width: 200px;
+  max-width: 100%;
+  margin: 0;
+  padding: 2rem 2.5rem;
+  background-color: #0d1117;
+  color-scheme: dark;
+}
+
+.file-markdown-github table {
+  display: table;
+  width: max-content;
+  max-width: 100%;
+  overflow: auto;
+}
+
+/* Visualizador global — Office (somente leitura) */
+.office-excel-preview,
+.office-docx-preview,
+.office-pptx-preview {
+  isolation: isolate;
+}
+/* docx-preview injeta estilos em .docx-style-host */
+.office-docx-preview .docx-body-host .docx-wrapper {
+  background: #fff;
+  padding: 1rem 1.5rem;
+  min-height: 100%;
+}
+.office-docx-preview .docx-body-host section.docx {
+  color: #171717;
+}

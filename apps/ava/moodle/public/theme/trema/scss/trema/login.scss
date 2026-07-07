@@ -1,0 +1,401 @@
+// Login page - left-align login form.
+body#page-login-index {
+
+    .col-xl-6.col-sm-8 {
+        min-width: 100%;
+    }
+
+    #region-main {
+        padding-top: 0;
+        background-color: $white;
+        height: 100vh;
+    }
+
+    #page-wrapper {
+        position: relative;
+        min-height: 100vh;
+        height: auto;
+        .lang-menu .dropdown-menu {
+            left: 0;
+            top: 65px;
+        }
+    }
+
+    #page {
+        padding-top: 0 !important;
+        background: none;
+        #card-login,
+        #card-login-instructions {
+            margin-top: 50px;
+        }
+
+        #region-main-box {
+            padding-top: 0;
+        }
+
+        &.has-navbar {
+            #region-main-box {
+                padding-top: 60px;
+            }
+        }
+        h2,
+        .h2 {
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+    }
+
+    #region-main-box {
+        padding: 0;
+    }
+
+    #page-content {
+        max-width: 550px;
+        margin: if($login-box-align == 'center', 0 auto, 0);
+        margin-left: if($login-box-align == 'left' or $login-box-align == 'halfleft', 0, auto);
+        align-items: if($login-box-align == 'center', center, normal);
+    }
+
+    #page-footer {
+        display: none;
+    }
+
+    .card {
+        @extend %border-frequency;
+    }
+
+    .card-header {
+        background-color: transparent;
+    }
+
+    &.style-image {
+        #page-wrapper {
+            background-image: url($login-backgroundimage);
+            background-position: top center;
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-attachment: fixed;
+        }
+    }
+
+    &.style-none {
+        #page-wrapper {
+            background-image: none;
+        }
+    }
+
+    .loginform {
+        h1.login-heading {
+            font-size: 1.5rem !important;
+            line-height: 2.5rem;
+            text-align: center;
+            margin: ($spacer * 3) 0 ($spacer * 3) 0;
+            color: $black;
+        }
+
+        .login-identityprovider-btn {
+            background-color: $white !important;
+            border: 1px solid $gray-600 !important;
+            color: $black !important;
+        }
+        .login-identityprovider-btn,
+        .btn-secondary {
+            white-space: normal;
+            height: auto;
+            line-height: 1.3rem;
+            padding: 10px 20px;
+        }
+        .login-form-password .toggle-sensitive-wrapper {
+            input[type="password"] {
+                border-radius: .4rem 0 0 .4rem;
+            }
+            .toggle-sensitive-btn {
+                box-shadow: none;
+            }
+        }
+        .login-logo {
+            text-align: center;
+        }
+    }
+
+    .login-wrapper {
+        align-items: normal;
+    }
+
+    .login-container {
+        box-shadow: none;
+    }
+
+    button.btn.btn-link.btn-cookie {
+        text-decoration: $links-decoration;
+    }
+
+    // Login-instructions overlay: at >=1120px the .login-instructions block is rendered once in the
+    // form column (in DOM) and visually relocated as an overlay onto the opposite half. Below 1120px
+    // these rules are not applied, so the block flows naturally below the Log in button. Applies to
+    // all non-center alignments (left, right, halfleft, halfright). Center is excluded because the
+    // form occupies the middle of the viewport and there is no obvious off-form half.
+    @if $login-box-align == 'left'
+        or $login-box-align == 'right'
+        or $login-box-align == 'halfleft'
+        or $login-box-align == 'halfright' {
+
+        @media (min-width: 1120px) {
+            // Anchor for the absolutely-positioned login-instructions overlay below.
+            #page-wrapper {
+                position: relative;
+            }
+
+            // Bootstrap 4 (Moodle 4.x) sets `position: relative` on every `.col-*` via the
+            // make-col-ready mixin, which Bootstrap 5 (Moodle 5.x) dropped. Without this override
+            // the closest positioned ancestor in 4.x becomes `#region-main.col-12` (constrained by
+            // `#page-content { max-width: 550px }`) instead of `#page-wrapper`, collapsing the
+            // overlay to a narrow strip. Force static so the absolute positioning falls through.
+            #region-main-box,
+            #region-main {
+                position: static;
+            }
+
+            // Overlay color knobs. Adjust these three values to tune the overlay appearance:
+            //   $overlay-base    - solid base color derived from the theme primary; bump the
+            //                      darken() percentage for a richer/darker tone.
+            //   $overlay-alpha   - opacity of the overlay (0 transparent .. 1 opaque).
+            //   $overlay-fg      - text/link color, picked automatically for WCAG contrast
+            //                      against the SOLID base color (alpha is not factored in).
+            $overlay-base: darken($primary, 15%);
+            $overlay-bg: rgba($overlay-base, .85);
+            $overlay-fg: choose-contrast-color($overlay-base);
+
+            .login-instructions {
+                // Constrain the absolute box to the off-form region via paired left/right, then
+                // centre with margin-inline: auto. rtlcss flips left<->right so this remains
+                // correctly mirrored in RTL without any /* rtl:ignore */ directives.
+                // For halfleft/halfright the off-form region is half the viewport. For left/right
+                // the form is only 550px wide and the off-form region is the rest of the viewport,
+                // so the overlay is allowed to be wider for visual balance.
+                position: absolute;
+                top: 50%;
+                transform: translateY(-50%);
+                @if $login-box-align == 'left' or $login-box-align == 'right' {
+                    max-width: 720px;
+                } @else {
+                    max-width: 480px;
+                }
+                max-height: 80vh;
+                overflow-y: auto;
+                margin-block: 0;
+                margin-inline: auto;
+                padding: 2rem;
+                background-color: $overlay-bg;
+                color: $overlay-fg;
+                border-radius: .5rem;
+                @if $overlay-fg == $white {
+                    text-shadow: 0 1px 2px rgba(0, 0, 0, .6);
+                } @else {
+                    text-shadow: 0 1px 2px rgba(255, 255, 255, .6);
+                }
+                z-index: 5;
+
+                @if $login-box-align == 'halfleft' {
+                    // Form pinned to left half -> overlay confined to right half.
+                    left: 50%;
+                    right: 0;
+                } @else if $login-box-align == 'halfright' {
+                    // Form pinned to right half -> overlay confined to left half.
+                    left: 0;
+                    right: 50%;
+                } @else if $login-box-align == 'left' {
+                    // Form pinned to left at 550px wide -> overlay fills the remaining width.
+                    left: 550px;
+                    right: 0;
+                } @else {
+                    // Form pinned to right at 550px wide -> overlay fills the remaining width.
+                    left: 0;
+                    right: 550px;
+                }
+
+                .login-heading,
+                h1,
+                h2,
+                h3,
+                a {
+                    color: $overlay-fg;
+                }
+
+                a {
+                    text-decoration: underline;
+                }
+            }
+
+            // Hide the divider that precedes the overlaid .login-instructions so the form column
+            // does not show a dangling separator. Falls back gracefully where :has() is unsupported.
+            .loginform .login-divider:has(+ .login-instructions) {
+                display: none;
+            }
+        }
+
+        // Print: restore the in-flow rendering of instructions; the overlay is screen-only.
+        @media print {
+            .login-instructions {
+                position: static;
+                max-height: none;
+                background: none;
+                color: inherit;
+                text-shadow: none;
+                transform: none;
+            }
+        }
+    }
+
+    // The halfleft/halfright settings additionally constrain the form column to half-viewport width
+    // so the overlay sits flush against the form. left/right keep the existing 550px form width.
+    @if $login-box-align == 'halfleft' or $login-box-align == 'halfright' {
+        @media (min-width: 1120px) {
+            #page-content {
+                max-width: 50%;
+            }
+        }
+
+        #region-main-box {
+            .login-container {
+                max-width: 550px;
+            }
+            .login-wrapper > div {
+                margin: 0 auto;
+            }
+        }
+    }
+}
+
+body#page-login-signup,
+body#page-login-forgot_password,
+body#page-login-verify_age_location {
+    &.style-image {
+        #page {
+            background: none;
+        }
+
+        #page-wrapper {
+            background-image: url($login-backgroundimage);
+            background-position: top center;
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-attachment: fixed;
+        }
+    }
+
+    &.style-none {
+        #page {
+            background: none;
+        }
+
+        #page-wrapper {
+            background-image: none;
+        }
+    }
+
+    #page-wrapper {
+        background-attachment: fixed;
+        .lang-menu .dropdown-menu {
+            left: 0;
+            top: 65px;
+        }
+    }
+    #page {
+        z-index: 10;
+        &.has-navbar {
+            #page-content {
+                margin-top: 6rem;
+            }
+        }
+
+        #page-content {
+            background: transparent;
+            @extend %border-frequency;
+            margin-top: 0;
+        }
+
+        .login-heading {
+            margin: 1.5rem 0;
+        }
+
+        .mform.full-width-labels .fitem.row > {
+            .col-md-3 {
+                flex: 0 0 25%;
+                max-width: 25%;
+            }
+
+            .col-md-9 {
+                flex: 0 0 75%;
+                max-width: 75%;
+            }
+        }
+    }
+    .login-container {
+        width: auto !important;
+        background-color: #fff;
+        padding: 3rem;
+        box-shadow: 0 .5rem 1rem rgb(0 0 0 / .15);
+        margin-bottom: 2rem;
+    }
+    .login-wrapper {
+        display: flex;
+        align-items: center;
+        min-height: 100vh;
+    }
+    #region-main-box.col-12 {
+        max-width: 800px;
+    }
+    #page-content {
+        width: auto;
+    }
+    .pt-5 {
+        padding-top: 0 !important;
+    }
+}
+
+body#page-login-verify_age_location {
+    #page-content {
+        padding: 3rem 1rem;
+    }
+}
+
+body#page-admin-tool-mfa-auth {
+    #region-main {
+        &:before {
+            content: none;
+        }
+        &:after {
+            content: none;
+        }
+    }
+    @media (min-width: 768px) {
+        .login-container {
+            width: auto !important;
+        }
+    }
+}
+
+body.local-login {
+    #login,
+    .loginform {
+        .login-form,
+        .login-form-forgotpassword,
+        .form-group,
+        .mb-3 {
+            display: block !important;
+        }
+    }
+}
+
+// Adjust form label and field alignment on small screens.
+@media only screen and (max-width: 560px) {
+    body #page .signupform .form-group.row.fitem,
+    body #page .signupform .mb-3.row.fitem {
+        display: block;
+    }
+    body #page .signupform .form-group.row.fitem .col-form-label,
+    body #page .signupform .mb-3.row.fitem .col-form-label {
+        max-width: 100% !important;
+    }
+}

@@ -1,0 +1,81 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template theme_trema/lang_menu
+
+    Custom menu item template for lang options
+
+    Context variables required for this template:
+    * title: The title of the menu item.
+    * url: The url of the menu item.
+    * text: The text of the menu item.
+    * children: The children of the menu item.
+    * divider: The divider of the menu item.
+    * uniqid: A unique identifier for the menu item.
+    * haschildren: The haschildren of the menu item.
+
+    Example context (json):
+    {
+        "title": "Language",
+        "url": "http://example.com",
+        "text": "English",
+        "children": [
+            {
+                "text": "English",
+                "title": "en",
+                "url": "http://example.com",
+                "divider": false
+            },
+            {
+                "divider": true
+            },
+            {
+                "text": "French",
+                "title": "fr",
+                "url": "http://example.com",
+                "divider": false
+            }
+        ],
+        "divider": false,
+        "uniqid": "123456",
+        "haschildren": true
+    }
+}}
+{{^divider}}
+{{#haschildren}}
+    <div class="lang-menu d-block position-relative">
+        <a class="{{#title}}dropdown-toggle {{/title}}nav-link" id="drop-down-{{uniqid}}" data-{{databs}}toggle="dropdown"
+                aria-haspopup="true" aria-expanded="false" href="#" {{^title}}title="{{#str}}language{{/str}}"{{/title}}
+                aria-label="{{#str}}langmenu,admin{{/str}}" aria-controls="drop-down-{{uniqid}}">
+            <i aria-hidden="true" class="fa fa-globe mr-1 me-1"></i>{{#title}} {{{title}}}{{/title}}
+        </a>
+        <div class="dropdown-menu" role="menu" id="drop-down-menu-{{uniqid}}" aria-labelledby="drop-down-{{uniqid}}">
+            {{#children}}
+                {{^divider}}
+                    <a class="dropdown-item" role="menuitem" href="{{{url}}}" lang="{{{title}}}">{{text}}</a>
+                {{/divider}}
+                {{#divider}}
+                    <div class="dropdown-divider"></div>
+                {{/divider}}
+            {{/children}}
+        </div>
+    </div>
+{{/haschildren}}
+{{^haschildren}}
+<a class="nav-item nav-link" href="{{{url}}}" {{#title}}title="{{{title}}}"{{/title}}>{{text}}</a>
+{{/haschildren}}
+{{/divider}}

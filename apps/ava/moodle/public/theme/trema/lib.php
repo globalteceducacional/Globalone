@@ -1,0 +1,461 @@
+<?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ * Lib file.
+ *
+ * @package     theme_trema
+ * @copyright   2019-2026 Trema - {@link https://trema.tech/}
+ * @copyright   2023-2026 TNG Consulting Inc. - {@link https://www.tngconsulting.ca/}
+ * @author      Rodrigo Mady
+ * @author      Trevor Furtado
+ * @author      Michael Milette
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+/**
+ * Get SCSS to prepend.
+ *
+ * @param theme_config $theme
+ *            The theme config object.
+ * @return string
+ */
+function theme_trema_get_pre_scss($theme) {
+    global $CFG;
+
+    $scss = '';
+
+    $scss .= file_get_contents("$CFG->dirroot/theme/trema/scss/defaultvariables.scss");
+
+    $configurable = [
+        // Target SCSS variable name => Trema theme setting.
+        'primary' => 'primarycolor',
+        'secondary' => 'secondarycolor',
+        'body-bg-color' => 'bodybackgroundcolor',
+        'body-font-family' => 'sitefont',
+        'h1-font-family' => 'h1font',
+        'hx-font-family' => 'hxfont',
+        'text-transform' => 'texttransform',
+        'banner-title-font-family' => 'bannertitlesfont',
+        'banner-title-transform' => 'bannertitletransform',
+        'banner-title-spacing' => 'bannertitlespacing',
+        'banner-text-align' => 'frontpagebannercontentalign',
+        'login-box-align' => 'loginboxcontentalign',
+        'banner-height' => 'bannerheight',
+        'custom-menu-alignment' => 'custommenualignment',
+        'links-decoration' => 'linkdecoration',
+        'dropdown-bg-color' => 'bodybackgroundcolor',
+        'footer-opacity' => 'footeropacity',
+    ];
+
+    // Prepend variables first.
+    foreach ($configurable as $scssvar => $themesetting) {
+        if (isset($theme->settings->{$themesetting})) {
+            $value = $theme->settings->{$themesetting};
+        } else {
+            continue;
+        }
+        $scss .= '$' . $scssvar . ': ' . $value . ";\n";
+    }
+
+    // ....
+    // Colors
+    // ....
+
+    {
+    // Background color of page header.
+    $headerbgcolor = get_config('theme_trema', 'headerbgcolor');
+    if (strpos('$#', substr($headerbgcolor, 0, 1)) === false) {
+        $headerbgcolor = get_config('theme_trema', $headerbgcolor);
+    }
+    $scss .= '$header-bg-color: ' . $headerbgcolor . " !default;\n";
+
+    // Background color of Log In button in page header.
+    $loginbtnbgcolor = get_config('theme_trema', 'loginbtnbgcolor');
+    if (strpos('$#', substr($loginbtnbgcolor, 0, 1)) === false) {
+        $loginbtnbgcolor = get_config('theme_trema', $loginbtnbgcolor);
+    }
+    $scss .= '$loginbtn-bg-color: ' . $loginbtnbgcolor . " !default;\n";
+
+    // Background color of drawers.
+    $drawerbgcolor = get_config('theme_trema', 'drawerbgcolor');
+    if (strpos('$#', substr($drawerbgcolor, 0, 1)) === false) {
+        $drawerbgcolor = get_config('theme_trema', $drawerbgcolor);
+    }
+    $scss .= '$drawer-bg-color: ' . $drawerbgcolor . " !default;\n";
+
+    // Background color of footer.
+    $footerbgcolor = get_config('theme_trema', 'footerbgcolor');
+    if (strpos('$#', substr($footerbgcolor, 0, 1)) === false) {
+        $footerbgcolor = get_config('theme_trema', $footerbgcolor);
+    }
+    $scss .= '$footer-bg-color: ' . $footerbgcolor . " !default;\n";
+    }
+
+    // ....
+    // Fonts
+    // ....
+
+    $fonts = [
+        'Arial, Helvetica, sans-serif' => 'Arial',
+        'Verdana, Tahoma, sans-serif' => 'Verdana',
+        '"Times New Roman", Times, serif' => 'TimesNewRoman',
+        'Georgia, serif' => 'Georgia',
+        '"Courier New", Courier, monospace' => 'CourierNew',
+        'Alegreya, serif' => 'Alegreya',
+        '"CrimsonText", serif' => 'CrimsonText',
+        '"EBGaramond", sans-serif' => 'EBGaramond',
+        'Lato, sans-serif' => 'Lato',
+        'Montserrat, sans-serif' => 'Montserrat',
+        '"NotoSans", sans-serif' => 'NotoSans',
+        '"OpenSans", sans-serif' => 'OpenSans',
+        '"PlayfairDisplay", serif' => 'PlayfairDisplay',
+        'Poppins, sans-serif' => 'Poppins',
+        'Roboto, Arial, Helvetica, sans-serif' => 'Roboto',
+    ];
+
+    $scss .= '$bodyfontfile: "' . ($fonts[$theme->settings->sitefont ?? ''] ?? 'Arial') . '";' . PHP_EOL;
+    $scss .= '$bannertitlesfontfile: "' . ($fonts[$theme->settings->bannertitlesfont ?? ''] ?? 'Arial') . '";' . PHP_EOL;
+    $scss .= '$h1fontfile: "' . ($fonts[$theme->settings->h1font ?? ''] ?? 'Arial') . '";' . PHP_EOL;
+    $scss .= '$hxfontfile: "' . ($fonts[$theme->settings->hxfont ?? ''] ?? 'Arial') . '";' . PHP_EOL;
+
+    // ....
+    // Show/hide User profile fields.
+    // ....
+
+    $fields = [];
+
+    // Section: General.
+    $fields['showprofileemaildisplay'] = '#fitem_id_maildisplay'; // Email display.
+    if ($CFG->branch < 502 && empty($theme->settings->showmoodlenetprofile)) {
+        // MoodleNet profile field removed from user table in Moodle 5.2+.
+        $fields['showmoodlenetprofile'] = '#fitem_id_moodlenetprofile';
+    }
+    $fields['showprofilecity'] = '#fitem_id_city'; // City.
+    $fields['showprofilecountry'] = '#fitem_id_country'; // Country.
+    $fields['showprofiletimezone'] = '#fitem_id_timezone'; // Timezone.
+
+    // Description.
+    $fields['showprofiledescription'] = 'body#page-user-editadvanced #fitem_id_description_editor,';
+    $fields['showprofiledescription'] .= 'body#page-admin-user-editadvanced #fitem_id_description_editor,';
+    $fields['showprofiledescription'] .= 'body#page-user-edit #fitem_id_description_editor,';
+    $fields['showprofiledescription'] .= 'body#page-login-signup #fitem_id_description_editor';
+
+    // Section: User Picture.
+    $fields['showprofilepictureofuser'] = '#id_moodle_picture';
+
+    // Section: Additional Names.
+    $fields['showprofileadditionalnames'] = '#id_moodle_additional_names';
+    $fields['showprofilefirstnamephonetic'] = '#fitem_id_firstnamephonetic';
+    $fields['showprofilelastnamephonetic'] = '#fitem_id_lastnamephonetic';
+    $fields['showprofilemiddlename'] = '#fitem_id_middlename';
+    $fields['showprofilealternatename'] = '#fitem_id_alternatename';
+
+    // Section: Interests.
+    $fields['showprofileinterests'] = '#id_moodle_interests';
+
+    // Section: Optional.
+    $fields['showprofileoptional'] = '#id_moodle_optional';
+
+    // MoodleNet profile ID (removed from user table in Moodle 5.2+).
+    if ($CFG->branch < 502) {
+        $fields['showprofilemoodlenetprofile'] = '#fitem_id_moodlenetprofile';
+    }
+    // ID number.
+    $fields['showprofileidnumber'] = 'body#page-user-editadvanced #fitem_id_idnumber,';
+    $fields['showprofileidnumber'] .= 'body#page-admin-user-editadvanced #fitem_id_idnumber,';
+    $fields['showprofileidnumber'] .= 'body#page-user-edit #fitem_id_idnumber,';
+    $fields['showprofileidnumber'] .= 'body#page-login-signup #fitem_id_idnumber';
+    // Institution.
+    $fields['showprofileinstitution'] = '#fitem_id_institution';
+    // Department.
+    $fields['showprofiledepartment'] = '#fitem_id_department';
+    // Phone.
+    $fields['showprofilephone1'] = '#fitem_id_phone1';
+    // Mobile phone.
+    $fields['showprofilephone2'] = '#fitem_id_phone2';
+    // Address.
+    $fields['showprofileaddress'] = '#fitem_id_address';
+
+    //
+    // Show/hide other elements.
+    //
+
+    // Activity module icons.
+    $fields['showactivityicons'] = '.page-header-image,.activityiconcontainer.courseicon';
+
+    // Login form.
+    $fields['loginshowloginform'] = '#login, .loginform .login-form, .login-form-forgotpassword form-group';
+
+    // User menu - Hide the Logout link.
+    $fields['showumlogoutlink'] = '#carousel-item-main a:last-of-type, #carousel-item-main .dropdown-divider:last-of-type';
+
+    // Links to Moodle 'Page' activities on Frontpage unless in edit mode on the front page.
+    $fields['showfrontpagelinkstopages'] = '#page-site-index:not(.editing) #page-content .modtype_page';
+
+    // Moodle branding.
+    $fields['showbranding'] = '.sitelink,.footer-section.p-3:not(.border-bottom)';
+
+    $customscss = '';
+    // Automatically hide guest login button if Auto-login Guests is enabled and Guest Login button is visible.
+    if (!empty($CFG->autologinguests) && !empty($CFG->guestloginbutton)) {
+        $customscss .= '#guestlogin,';
+    }
+
+    // ....
+    // Combine all of the fields that we need to hide.
+    // ....
+
+    foreach ($fields as $setting => $field) {
+        if (empty($theme->settings->$setting)) {
+            $customscss .= $field . ',' . PHP_EOL;
+        }
+    }
+    // If there is something to hide, hide it.
+    if (!empty($customscss)) {
+        $scss .= $customscss . 'displaynone {display: none;}';
+    }
+
+    // ....
+    // Login page
+    // ....
+
+    // Background image.
+    $backgroundimageurl = $theme->setting_file_url('loginbackgroundimage', 'loginbackgroundimage');
+    if ($theme->settings->loginpagestyle == 'image' && !empty($backgroundimageurl)) {
+        $scss .= "\$login-backgroundimage: '$backgroundimageurl';\n";
+    } else {
+        $scss .= "\$login-backgroundimage: '[[pix:theme|login/background]]';\n";
+    }
+
+    // Not image in settings.
+    if ($theme->settings->loginpagestyle !== 'image') {
+        $scss .= "body.pagelayout-login #page-wrapper { background-image: none; }\n";
+    }
+
+    // Login page fixes for Moodle 5.2+.
+    if ($CFG->branch >= 502) {
+        $scss .= '
+        $spacer: 1rem !default;
+            body#page-login-index {
+                .loginform {
+                    h1.login-heading {
+                        margin: ($spacer * 2) 0;
+                    }
+                    .login-divider {
+                        margin: ($spacer * 0.5) 0;
+                    }
+                }
+            }
+            .pagelayout-login .login-container {
+                background-color: #fff;
+                padding: 3rem;
+                box-shadow: 0 .5rem 1rem rgb(0 0 0 / .15);
+                margin-bottom: 2rem;
+            }
+        ';
+    }
+
+    // ....
+    // Other settings.
+    // ....
+
+    // Softness: Rounding some corners.
+    $scss .= '$softness: ' . (!empty($theme->settings->softness) ? '.4rem' : '0') . ";\n";
+
+    // ....
+    // Prepend pre-scss.
+    // ....
+
+    if (! empty($theme->settings->scsspre)) {
+        $scss .= $theme->settings->scsspre;
+    }
+
+    return $scss;
+}
+
+/**
+ * Load the main SCSS and the frontpage banner.
+ *
+ * @param theme_config $theme
+ *            The theme config object.
+ * @return string
+ */
+function theme_trema_get_main_scss_content($theme) {
+    global $CFG, $SITE;
+
+    $scss = '';
+
+    $filename = !empty($theme->settings->preset) ? $theme->settings->preset : 'default.scss';
+    $scss .= file_get_contents("$CFG->dirroot/theme/trema/scss/preset/{$filename}");
+
+    if (empty($theme->settings->enabletremalines)) {
+        $scss .= "%border-frequency { &:before, &:after { content: none !important;}}";
+    }
+
+    // Frontpage banner.
+    if (!empty($theme->settings->frontpageenabledarkoverlay)) {
+        $darkoverlay = "url([[pix:theme|frontpage/overlay]]),";
+    } else {
+        $darkoverlay = "";
+    }
+
+    if ($frontpagebannerurl = $theme->setting_file_url('frontpagebanner', 'frontpagebanner')) {
+        $scss .= "#frontpage-banner {background-image: $darkoverlay url('$frontpagebannerurl');}";
+    } else {
+        $scss .= "#frontpage-banner {background-image: $darkoverlay url([[pix:theme|frontpage/banner]]);}";
+    }
+
+    // Compensate for long site names.
+    $sitenamefontscale = strlen($SITE->shortname) < 36 ? '1' : '0.75';
+    $scss .= '$sitename-font-scale: ' . $sitenamefontscale . ";\n";
+
+    return $scss;
+}
+
+/**
+ * Inject additional SCSS for images.
+ *
+ * @param theme_config $theme Theme config object.
+ * @return string
+ */
+function theme_trema_get_extra_scss($theme) {
+    $scss = '';
+
+    // Sets the background image and its settings.
+    $imageurl = $theme->setting_file_url('backgroundimage', 'backgroundimage');
+    if (!empty($imageurl)) {
+        $scss .= '@media (min-width: 768px) { ';
+        $scss .= '    body { ';
+        $scss .= '        background-image: url("' . $imageurl . '"); ';
+        $scss .= '        background-size: cover; ';
+        $scss .= '        background-attachment: fixed; ';
+        $scss .= '    } ';
+        $scss .= "}\n";
+    }
+
+    // Always return the background image with the scss when we have it.
+    return !empty($theme->settings->scss) ? "{$theme->settings->scss}  \n  {$scss}" : $scss;
+}
+
+/**
+ * Serves any files associated with the theme settings.
+ *
+ * @param stdClass $course
+ * @param stdClass $cm
+ * @param context $context
+ * @param string $filearea
+ * @param array $args
+ * @param bool $forcedownload
+ * @param array $options
+ * @return bool
+ */
+function theme_trema_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload, array $options = []) {
+    if ($context->contextlevel == CONTEXT_SYSTEM) {
+        $theme = theme_config::load('trema');
+        // By default, theme files must be cache-able by both browsers and proxies.
+        if (! array_key_exists('cacheability', $options)) {
+            $options['cacheability'] = 'public';
+        }
+        return $theme->setting_file_serve($filearea, $args, $forcedownload, $options);
+    } else {
+        send_file_not_found();
+    }
+}
+
+
+/**
+ * MoodlePage init for adding classes to body tag.
+ *
+ * @param moodle_page $page
+ * @throws coding_exception
+ */
+function theme_trema_page_init(moodle_page $page) {
+    global $COURSE, $USER;
+
+    // Add admin classes.
+    $page->add_body_class(is_siteadmin() ? "is_siteadmin" : "not_siteadmin");
+
+    // Add module idnumber class.
+    if (in_array($page->pagelayout, ['incourse']) && !empty($page->cm->idnumber)) {
+        $page->add_body_class("idnumber-{$page->cm->idnumber}");
+    }
+
+    // Add role classes.
+    if (in_array($page->pagelayout, ['course', 'incourse'])) {
+        $context = context_course::instance($COURSE->id);
+        if (user_has_role_assignment($USER->id, 5, $context->id)) {
+            $page->add_body_class('is_student');
+        }
+        if (user_has_role_assignment($USER->id, 4, $context->id)) {
+            $page->add_body_class('is_teacher');
+        }
+        if (user_has_role_assignment($USER->id, 3, $context->id)) {
+            $page->add_body_class('is_editingteacher');
+        }
+    }
+
+    // Show Login form if URL parameters include saml=off or auth=manual.
+    if (optional_param('saml', '', PARAM_ALPHA) === 'off' || optional_param('auth', '', PARAM_ALPHA) === 'manual') {
+        $page->add_body_class('local-login');
+    }
+
+    // Load course style by shortname from: /style/course/$shortname.css.
+    if ($COURSE->id > 1) {
+        $shortname   = explode('|', $COURSE->shortname);
+        $shortname   = trim($shortname[0]);
+        $coursestyle = "/style/course/{$shortname}.css";
+        if (file_exists($page->theme->dir . $coursestyle)) {
+            $page->requires->css(new moodle_url("/theme/trema{$coursestyle}"));
+        }
+    }
+
+    // Load profilefields JS if the setting is enabled.
+    $enforcerequiredprofilefields = get_config('theme_trema', 'enforcerequiredprofilefields');
+    if (!empty($enforcerequiredprofilefields)) {
+        $pagepath = $page->url->get_path();
+        $isusercreationpage = (strpos($pagepath, '/user/editadvanced.php') !== false && $page->url->get_param('id') == -1);
+
+        // If this is the user creation page, prepare the required fields data.
+        $profilefieldsdata = theme_trema_get_profilefields_data();
+        if ($isusercreationpage && !empty($profilefieldsdata)) {
+            $page->requires->js_call_amd('theme_trema/profilefields', 'init', $profilefieldsdata);
+        }
+    }
+}
+
+/**
+ * Get profile fields data for the user creation page.
+ *
+ * @return array Array containing required profile fields
+ */
+function theme_trema_get_profilefields_data(): ?array {
+    global $DB, $CFG;
+    require_once("{$CFG->dirroot}/user/profile/lib.php");
+
+    $requiredfields = [];
+    // Get all profile fields.
+    $profilefields = $DB->get_records('user_info_field');
+
+    // Extract the required fields.
+    foreach ($profilefields as $field) {
+        if ($field->required) {
+            $requiredfields[] = $field->shortname;
+        }
+    }
+
+    return !empty($requiredfields) ? ['requiredfields' => $requiredfields] : null;
+}

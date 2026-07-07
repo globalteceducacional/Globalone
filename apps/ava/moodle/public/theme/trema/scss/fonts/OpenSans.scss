@@ -1,0 +1,85 @@
+@charset "utf-8";
+
+@font-face {
+    font-weight: 300;
+    font-style: normal;
+    font-family: "OpenSans";
+    src: url([[font:theme|OpenSans-Light.ttf]]) format("truetype");
+}
+
+@font-face {
+    font-weight: 300;
+    font-style: italic;
+    font-family: "OpenSans";
+    src: url([[font:theme|OpenSans-LightItalic.ttf]]) format("truetype");
+}
+
+@font-face {
+    font-weight: normal;
+    font-style: normal;
+    font-family: "OpenSans";
+    src: url([[font:theme|OpenSans-Regular.ttf]]) format("truetype");
+}
+
+@font-face {
+    font-weight: normal;
+    font-style: italic;
+    font-family: "OpenSans";
+    src: url([[font:theme|OpenSans-Italic.ttf]]) format("truetype");
+}
+
+@font-face {
+    font-weight: 500;
+    font-style: normal;
+    font-family: "OpenSans";
+    src: url([[font:theme|OpenSans-Medium.ttf]]) format("truetype");
+}
+
+@font-face {
+    font-weight: 500;
+    font-style: italic;
+    font-family: "OpenSans";
+    src: url([[font:theme|OpenSans-MediumItalic.ttf]]) format("truetype");
+}
+
+@font-face {
+    font-weight: 600;
+    font-style: normal;
+    font-family: "OpenSans";
+    src: url([[font:theme|OpenSans-SemiBold.ttf]]) format("truetype");
+}
+
+@font-face {
+    font-weight: 600;
+    font-style: italic;
+    font-family: "OpenSans";
+    src: url([[font:theme|OpenSans-SemiBoldItalic.ttf]]) format("truetype");
+}
+
+@font-face {
+    font-weight: 700;
+    font-style: normal;
+    font-family: "OpenSans";
+    src: url([[font:theme|OpenSans-Bold.ttf]]) format("truetype");
+}
+
+@font-face {
+    font-weight: 700;
+    font-style: italic;
+    font-family: "OpenSans";
+    src: url([[font:theme|OpenSans-BoldItalic.ttf]]) format("truetype");
+}
+
+@font-face {
+    font-weight: 800;
+    font-style: normal;
+    font-family: "OpenSans";
+    src: url([[font:theme|OpenSans-ExtraBold.ttf]]) format("truetype");
+}
+
+@font-face {
+    font-weight: 800;
+    font-style: italic;
+    font-family: "OpenSans";
+    src: url([[font:theme|OpenSans-ExtraBoldItalic.ttf]]) format("truetype");
+}

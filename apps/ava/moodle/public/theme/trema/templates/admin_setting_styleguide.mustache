@@ -1,0 +1,395 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template theme_boost/admin_setting_styleguide
+
+    Style guide present in theme settings.
+
+    Context variables required for this template: None.
+
+    Example context (json):
+    {
+    }
+}}
+<div class="container box large bordered">
+    <div class="jumbotron w-100 py-5 mx-auto bg-light rounded-3">
+        <h1 class="display-3">Trema Style Guide</h1>
+        <p class="lead">Examples of various elements styled with Bootstrap in the Trema theme.</p>
+    </div>
+    <header class="major special">
+        <h2>Elements</h2>
+        <p>Lorem ipsum dolor sit amet nullam id egestas urna aliquam</p>
+    </header>
+    <section>
+        <h3>Text</h3>
+        <p>This is <b>bold</b> and this is <strong>strong</strong>. This is <i>italic</i> and this is
+            <em>emphasized</em>. This is <sup>superscript</sup> text and this is <sub>subscript</sub> text. This is <u>underlined</u>
+            and this is code: <code>for (;;) { ... }</code>. Finally, <a href="#">this is a link</a>.
+        </p>
+        <hr>
+        <h2>Heading Level 2</h2>
+        <p>Paragraph under heading 2.</p>
+        <h3>Heading Level 3</h3>
+        <p>Paragraph under heading 3.</p>
+        <h4>Heading Level 4</h4>
+        <p>Paragraph under heading 4.</p>
+        <h5>Heading Level 5</h5>
+        <p>Paragraph under heading 5.</p>
+        <h6>Heading Level 6</h6>
+        <p>Paragraph under heading 6.</p>
+        <hr>
+        <h4>Blockquote</h4>
+        <blockquote>Fringilla nisl. Donec accumsan interdum nisi, quis tincidunt felis sagittis eget tempus euismod.
+            Vestibulum ante ipsum primis in faucibus vestibulum. Blandit adipiscing eu felis iaculis volutpat ac
+            adipiscing accumsan faucibus. Vestibulum ante ipsum primis in faucibus lorem ipsum dolor sit amet nullam
+            adipiscing eu felis.
+        </blockquote>
+        <h4>Preformatted</h4>
+        <pre><code>i = 0;
+while (!deck.isInOrder()) {
+    print 'Iteration ' + i;
+    deck.shuffle();
+    i++;
+}
+print 'It took ' + i + ' iterations to sort the deck.';
+</code></pre>
+    </section>
+    <section>
+        <h3>Lists</h3>
+        <div class="row">
+            <div class="col-6 col-12-xsmall">
+                <h4>Unordered</h4>
+                <ul>
+                    <li>Dolor pulvinar etiam magna etiam.</li>
+                    <li>Sagittis adipiscing lorem eleifend.</li>
+                    <li>Felis enim feugiat dolore viverra.</li>
+                </ul>
+                <h4>Alternate</h4>
+                <ul class="alt">
+                    <li>Dolor pulvinar etiam magna etiam.</li>
+                    <li>Sagittis adipiscing lorem eleifend.</li>
+                    <li>Felis enim feugiat dolore viverra.</li>
+                </ul>
+            </div>
+            <div class="col-6 col-12-xsmall">
+                <h4>Ordered</h4>
+                <ol>
+                    <li>Dolor pulvinar etiam magna etiam.</li>
+                    <li>Etiam vel felis at lorem sed viverra.</li>
+                    <li>Felis enim feugiat dolore viverra.</li>
+                    <li>Dolor pulvinar etiam magna etiam.</li>
+                    <li>Etiam vel felis at lorem sed viverra.</li>
+                    <li>Felis enim feugiat dolore viverra.</li>
+                </ol>
+            </div>
+        </div>
+        <h3>Icons</h3>
+        <ul class="list-group list-group-horizontal list-unstyled mb-3">
+            <li class="d-inline m-r-1"><a href="#"><i class="icon fa fa-2x fa-twitter" role="tooltip" aria-hidden="true" title="Twitter"></i><span class="fa-sr-only">Twitter</span></a></li>
+            <li class="d-inline m-r-1"><a href="#"><i class="icon fa fa-2x fa-facebook" role="tooltip" aria-hidden="true" title="Facebook"></i><span class="fa-sr-only">Facebook</span></a></li>
+            <li class="d-inline m-r-1"><a href="#"><i class="icon fa fa-2x fa-instagram" role="tooltip" aria-hidden="true" title="Instagram"></i><span class="fa-sr-only">Instagram</span></a></li>
+            <li class="d-inline m-r-1"><a href="#"><i class="icon fa fa-2x fa-github" role="tooltip" aria-hidden="true" title="GitHub"></i><span class="fa-sr-only">GitHub</span></a></li>
+            <li class="d-inline m-r-1"><a href="#"><i class="icon fa fa-2x fa-dribbble" role="tooltip" aria-hidden="true" title="Dribbble"></i><span class="fa-sr-only">Dribbble</span></a></li>
+            <li class="d-inline m-r-1"><a href="#"><i class="icon fa fa-2x fa-tumblr" role="tooltip" aria-hidden="true" title="Tumblr"></i><span class="fa-sr-only">Tumblr</span></a></li>
+        </ul>
+        <h3>Buttons</h3>
+        <h4>Classes</h4>
+        <ul class="list-group list-group-horizontal list-unstyled mb-3">
+            <li><a href="#" class="btn">Default</a> &nbsp;</li>
+            <li><a href="#" class="btn btn-primary">Primary</a> &nbsp;</li>
+            <li><a href="#" class="btn btn-secondary">Secondary</a> &nbsp;</li>
+            <li><a href="#" class="btn btn-success">Success</a> &nbsp;</li>
+            <li><a href="#" class="btn btn-danger">Danger</a> &nbsp;</li>
+            <li><a href="#" class="btn btn-warning">Warning</a> &nbsp;</li>
+            <li><a href="#" class="btn btn-info">Info</a> &nbsp;</li>
+            <li><a href="#" class="btn btn-light">Light</a> &nbsp;</li>
+            <li><a href="#" class="btn btn-dark">Dark</a> &nbsp;</li>
+            <li><a href="#" class="btn btn-outline-primary">Primary Outline</a></li>
+        </ul>
+        <h4>Sizes</h4>
+        <ul class="list-group list-group-horizontal list-unstyled mb-3">
+            <li><a href="#" class="btn btn-primary btn-lg">Large</a> &nbsp;</li>
+            <li><a href="#" class="btn btn-primary">Default</a> &nbsp;</li>
+            <li><a href="#" class="btn btn-primary btn-sm">Small</a> &nbsp;</li>
+        </ul>
+        <h4>Fit</h4>
+        <div class="row">
+            <div class="col-6 col-12-xsmall">
+                <ul class="list-group list-group-horizontal list-unstyled fit small mb-3">
+                    <li><a href="#" class="btn btn-primary fit btn-sm">Primary Fit + Small</a> &nbsp;</li>
+                    <li><a href="#" class="btn fit btn-sm">Default Fit + Small</a> &nbsp;</li>
+                    <li><a href="#" class="btn btn-secondary fit btn-sm">Secondary Fit + Small</a> &nbsp;</li>
+                </ul>
+            </div>
+        </div>
+        <h4>With icons</h4>
+        <ul class="list-group list-group-horizontal list-unstyled mb-3">
+            <li><a href="#" class="btn btn-primary"><i class="fa fa-download"></i>&nbsp;Primary</a> &nbsp;</li>
+            <li><a href="#" class="btn"><i class="fa fa-download"></i>&nbsp;Default</a> &nbsp;</li>
+            <li><a href="#" class="btn btn-secondary"><i class="fa fa-download"></i>&nbsp;Secondary</a> &nbsp;</li>
+        </ul>
+        <h4>Disabled</h4>
+        <ul class="list-group list-group-horizontal list-unstyled mb-3">
+            <li><span class="btn btn-primary disabled">Primary</span> &nbsp;</li>
+            <li><span class="btn disabled">Default</span> &nbsp;</li>
+            <li><span class="btn btn-secondary disabled">Secondary</span> &nbsp;</li>
+        </ul>
+        <h4>Types</h4>
+        <ul class="list-group list-group-horizontal list-unstyled mb-3">
+            <li><a class="btn btn-primary" href="#" role="button">Link</a> &nbsp;</li>
+            <li><button class="btn btn-primary" type="submit">Button</button> &nbsp;</li>
+            <li><input class="btn btn-primary" type="button" value="Input Button"> &nbsp;</li>
+            <li><input class="btn btn-primary" type="submit" value="Input Submit"> &nbsp;</li>
+            <li><input class="btn btn-primary" type="reset" value="Input Reset"> &nbsp;</li>
+        </ul>
+        <h3>Progress bar</h3>
+        <div class="col-md-12">
+            <div class="progress mb-2">
+                <div class="progress-bar bg-primary w-25" role="progressbar" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">25%</div>
+            </div>
+        </div>
+    </section>
+    <section>
+        <h3>Alerts</h3>
+        <div class="alert alert-primary" role="alert">A simple primary alert — <a href="#">check it out!</a></div>
+        <div class="alert alert-secondary" role="alert">A simple secondary alert — <a href="#">check it out!</a></div>
+        <div class="alert alert-success" role="alert">A simple success alert — <a href="#">check it out!</a></div>
+        <div class="alert alert-danger" role="alert">A simple danger alert — <a href="#">check it out!</a></div>
+        <div class="alert alert-warning" role="alert">A simple warning alert — <a href="#">check it out!</a></div>
+        <div class="alert alert-info" role="alert">A simple info alert — <a href="#">check it out!</a></div>
+        <div class="alert alert-light" role="alert">A simple light alert — <a href="#">check it out!</a></div>
+        <div class="alert alert-dark" role="alert">A simple dark alert — <a href="#">check it out!</a></div>
+        <div class="col-md-12">
+            <div class="alert alert-primary alert-dismissable show fade" role="alert">
+                <button type="button" class="close btn-close" data-dismiss="alert" data-bs-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+                After reading this message, you can close it.
+            </div>
+        </div>
+    </section>
+    <section>
+        <h3>Table</h3>
+        {{! https://getbootstrap.com/docs/4.0/components/badge/ }}
+        <h4>Default with badges</h4>
+        <div class="table-wrapper">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Price</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>Item 1</td>
+                    <td>Ante turpis integer aliquet porttitor. <span class="badge badge-primary text-bg-primary">Primary badge</span></td>
+                    <td>9.99</td>
+                </tr>
+                <tr>
+                    <td>Item 2</td>
+                    <td>Vis ac commodo adipiscing arcu aliquet. <span class="badge badge-secondary text-bg-secondary">Secondary badge</span></td>
+                    <td>29.99</td>
+                </tr>
+                <tr>
+                    <td>Item 3</td>
+                    <td> Morbi faucibus arcu accumsan lorem. <span class="badge badge-success text-bg-success">Success badge</span></td>
+                    <td>39.99</td>
+                </tr>
+                <tr>
+                    <td>Item 4</td>
+                    <td>Vitae integer tempus condimentum. <span class="badge badge-danger text-bg-danger">Danger badge</span></td>
+                    <td>49.99</td>
+                </tr>
+                <tr>
+                    <td>Item 5</td>
+                    <td>Ante turpis integer aliquet porttitor. <span class="badge badge-warning text-bg-warning">Warning badge</span></td>
+                    <td>59.99</td>
+                </tr>
+                <tr>
+                    <td>Item 6</td>
+                    <td>Undte murpis realu gratical marente. <span class="badge badge-info text-bg-info">Info badge</span></td>
+                    <td>69.99</td>
+                </tr>
+                <tr>
+                    <td>Item 7</td>
+                    <td>Sed quia consequuntur magni dolores. <span class="badge badge-light text-bg-light">Light badge</span></td>
+                    <td>79.99</td>
+                </tr>
+                <tr>
+                    <td>Item 8</td>
+                    <td>Nisi ut aliquid ex ea commodi consequatur. <span class="badge badge-dark text-bg-dark">Dark badge</span></td>
+                    <td>89.99</td>
+                </tr>
+                </tbody>
+                <tfoot>
+                <tr>
+                    <td colspan="2">Total</td>
+                    <td>449.92</td>
+                </tr>
+                </tfoot>
+            </table>
+        </div>
+        <h4>Alternate with pills</h4>
+        {{! https://getbootstrap.com/docs/4.0/components/badge/ }}
+        <div class="table-wrapper table">
+            <table class="table table-bordered table-hover table-striped">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Price</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>Item 1</td>
+                    <td>Ante turpis integer aliquet porttitor. <span class="badge badge-pill rounded-pill badge-primary text-bg-primary">Primary pill</span></td>
+                    <td>9.99</td>
+                </tr>
+                <tr>
+                    <td>Item 2</td>
+                    <td>Vis ac commodo adipiscing arcu aliquet. <span class="badge badge-pill rounded-pill badge-secondary text-bg-secondary">Secondary pill</span></td>
+                    <td>29.99</td>
+                </tr>
+                <tr>
+                    <td>Item 3</td>
+                    <td> Morbi faucibus arcu accumsan lorem. <span class="badge badge-pill rounded-pill badge-success text-bg-success">Success pill</span></td>
+                    <td>39.99</td>
+                </tr>
+                <tr>
+                    <td>Item 4</td>
+                    <td>Vitae integer tempus condimentum. <span class="badge badge-pill rounded-pill badge-danger text-bg-danger">Danger pill</span></td>
+                    <td>49.99</td>
+                </tr>
+                <tr>
+                    <td>Item 5</td>
+                    <td>Ante turpis integer aliquet porttitor. <span class="badge badge-pill rounded-pill badge-warning text-bg-warning">Warning pill</span></td>
+                    <td>59.99</td>
+                </tr>
+                <tr>
+                    <td>Item 6</td>
+                    <td>Undte murpis realu gratical marente. <span class="badge badge-pill rounded-pill badge-info text-bg-info">Info pill</span></td>
+                    <td>69.99</td>
+                </tr>
+                <tr>
+                    <td>Item 7</td>
+                    <td>Sed quia consequuntur magni dolores. <span class="badge badge-pill rounded-pill badge-light text-bg-light">Light pill</span></td>
+                    <td>79.99</td>
+                </tr>
+                <tr>
+                    <td>Item 8</td>
+                    <td>Nisi ut aliquid ex ea commodi consequatur. <span class="badge badge-pill rounded-pill badge-dark text-bg-dark">Dark pill</span></td>
+                    <td>89.99</td>
+                </tr>
+                </tbody>
+                <tfoot>
+                <tr>
+                    <td colspan="2">Total</td>
+                    <td>449.92</td>
+                </tr>
+                </tfoot>
+            </table>
+        </div>
+    </section>
+    <section>
+        <h3>Form</h3>
+        <form method="post" action="#" class="mform">
+            <fieldset class="clearfix collapsible" id="id_moodle">
+                <div class="fcontainer clearfix">
+                    <div id="fitem_id_username" class="form-group mb-3 row fitem">
+                        <div class="col-md-3">
+                            <span class="float-sm-right text-nowrap">
+                                <a href="" class="btn btn-link p-0" role="button" data-container="body" data-toggle="popover" data-bs-toggle="popover"
+                                    data-placement="right" data-bs-placement="right"
+                                    data-content="<div class=&quot;no-overflow&quot;><p>Vis ac commodo adipiscing arcu aliquet...</p></div>"
+                                    data-bs-content="<div class=&quot;no-overflow&quot;><p>Vis ac commodo adipiscing arcu aliquet...</p></div>"
+                                    data-html="true"
+                                    tabindex="0" data-trigger="focus" data-bs-trigger="focus">
+                                    <i class="icon fa fa-question-circle text-info fa-fw" aria-hidden="true"></i>
+                                </a>
+                            </span>
+                            <label class="col-form-label d-inline" for="id_username">
+                                {{#str}}username{{/str}}
+                            </label>
+                        </div>
+                        <div class="col-md-9 form-inline felement" data-fieldtype="text">
+                            <input type="text" class="form-control" name="username" id="id_username" value="admin" size="20">
+                            <div class="form-control-feedback invalid-feedback" id="id_error_username"></div>
+                        </div>
+                    </div>
+                    <div id="fitem_id_newpassword" class="form-group mb-3 row fitem">
+                        <div class="col-md-3">
+                            <label class="col-form-label d-inline" for="id_newpassword">
+                                {{#str}}newpassword{{/str}}
+                            </label>
+                        </div>
+                        <div class="col-md-9 form-inline felement" data-fieldtype="passwordunmask">
+                            <span data-passwordunmask="wrapper" data-passwordunmaskid="id_newpassword">
+                                <span data-passwordunmask="editor">
+                                    <input type="password" name="newpassword" id="id_newpassword" value="" class="form-control d-inline-block" data-size="20">
+                                </span>
+                            </span>
+                        </div>
+                    </div>
+                    <div id="fitem_id_maildisplay" class="form-group mb-3 row fitem">
+                        <div class="col-md-3">
+                            <label class="col-form-label d-inline" for="id_maildisplay">
+                                {{#str}}emaildisplay{{/str}}
+                            </label>
+                        </div>
+                        <div class="col-md-9 form-inline felement" data-fieldtype="select">
+                            <select class="custom-select form-select" name="maildisplay" id="id_maildisplay">
+                                <option value="0">{{#str}}emaildisplayno{{/str}}</option>
+                                <option value="1" selected="">{{#str}}emaildisplayyes{{/str}}</option>
+                                <option value="2">{{#str}}emaildisplaycourse{{/str}}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div id="fitem_id_otgcode" class="form-group mb-3 row fitem">
+                        <div class="col-md-9 offset-md-3 form-inline felement">
+                            <input type="text" name="otg-code" id="id_moreinfo" value="" placeholder="OTG code placeholder" class="form-control d-inline-block" data-size="20"><br>
+                        </div>
+                    </div>
+                    <div class="form-group mb-3 form-check row fitem">
+                        <div class="col-md-9 offset-md-3 form-inline felement">
+                            <input type="checkbox" class="form-check-input" id="exampleCheck1">
+                            <label class="form-check-label" for="exampleCheck1">Check me out</label>
+                        </div>
+                    </div>
+                    <div id="fitem_id_dropdown" class="form-group mb-3 row fitem">
+                        <div class="col-md-3">
+                            <label class="col-form-label d-inline" for="id_dropdown">
+                                Rate this page
+                            </label>
+                        </div>
+                        <div class="col-md-9 form-inline felement">
+                            <select class="form-control" id="id_dropdown">
+                                <option>5 Stars (Best)</option>
+                                <option>4 Stars (Good)</option>
+                                <option>3 Stars (Average)</option>
+                                <option>2 Stars (Fair)</option>
+                                <option>1 Star (Poor)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </fieldset>
+        </form>
+    </section>
+</div>

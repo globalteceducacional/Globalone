@@ -1,0 +1,82 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template theme_trema/fontpage_cards
+
+    Card for each available courses on the frontpage and search results.
+
+    Context variables required for this template: None.
+    * cardstitle: The title of the card section.
+    * cardssubtitle: The subtitle of the card section.
+    * cardssettings: The settings for each card.
+        * cardicon: The icon of the card.
+        * cardiconcolor: The color of the icon.
+        * cardtitle: The title of the card.
+        * cardsubtitle: The subtitle of the card.
+        * cardlink: The link of the card.
+
+    Example context (json):
+    {
+        "cardstitle": "Courses",
+        "cardssubtitle": "Choose from a variety of courses",
+        "cardssettings": [
+            {
+                "cardicon": "fa-book",
+                "cardiconcolor": "#007bff",
+                "cardtitle": "Course 1",
+                "cardsubtitle": "Course 1 description",
+                "cardlink": "http://example.com/course/view.php?id=1"
+            },
+            {
+                "cardicon": "fa-book",
+                "cardiconcolor": "#007bff",
+                "cardtitle": "Course 2",
+                "cardsubtitle": "Course 2 description",
+                "cardlink": "http://example.com/course/view.php?id=2"
+            }
+        ]
+    }
+}}
+
+<div id="frontpage-cards" class="container mt-5">
+    <div id="frontpage-cards-title" class="row mx-3 p-4 pt-0 text-center">
+        <div class="col-12 pt-3 pb-3">
+            {{#cardstitle}}
+                <h2 class="border-bottom p-3 m-2 mb-4">{{{cardstitle}}}</h2>
+            {{/cardstitle}}
+            {{#cardssubtitle}}
+                <p class="font-weight-light fw-light">
+                    {{{cardssubtitle}}}
+                </p>
+            {{/cardssubtitle}}
+        </div>
+    </div>
+
+    <div id="frontpage-cards-content" class="row">
+    {{#cardssettings}}
+        <div class="frontpage-card col-sm-6 p-5">
+            {{#cardlink}}<a href="{{cardlink}}">{{/cardlink}}
+                <span class="fa {{cardicon}} fa-4x float-start float-left me-4 mr-4 mt-2" style="color: {{cardiconcolor}};"></span>
+            {{#cardlink}}</a>{{/cardlink}}
+            {{#cardlink}}<a href="{{cardlink}}">{{/cardlink}}
+                <h3>{{{cardtitle}}}</h3>
+            {{#cardlink}}</a>{{/cardlink}}
+            <p class="font-weight-light fw-light">{{{cardsubtitle}}}</p>
+        </div>
+        {{/cardssettings}}
+    </div>
+</div>

@@ -1,0 +1,95 @@
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: erp-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-erp}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-senha123}
+      POSTGRES_DB: ${POSTGRES_DB:-erpdb}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-erp} -d ${POSTGRES_DB:-erpdb}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - erp-network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: erp-backend
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-erp}:${POSTGRES_PASSWORD:-senha123}@db:5432/${POSTGRES_DB:-erpdb}
+      JWT_SECRET: ${JWT_SECRET:-super-segredo-alterar-em-producao}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-7d}
+      CORS_ORIGINS: ${CORS_ORIGINS:-}
+      # Espelho / banco de horas “até hoje” usam meia-noite local; VPS em UTC sem TZ quebra o recorte do mês.
+      TZ: ${TZ:-America/Sao_Paulo}
+      # Produção/Docker: porta 3001. Dev local usa 3000.
+      PORT: ${BACKEND_PORT:-3001}
+      NODE_ENV: ${NODE_ENV:-production}
+      UPLOADS_DIR: /app/uploads
+      UPLOADS_URL_PREFIX: /uploads
+      UPLOAD_MAX_MB: ${UPLOAD_MAX_MB:-2048}
+      VAPID_PUBLIC_KEY: ${VAPID_PUBLIC_KEY:-}
+      VAPID_PRIVATE_KEY: ${VAPID_PRIVATE_KEY:-}
+      VAPID_SUBJECT: ${VAPID_SUBJECT:-mailto:no-reply@example.com}
+    ports:
+      - "${BACKEND_PORT:-3001}:3001"
+    volumes:
+      # Montar apenas o necessário para desenvolvimento (opcional)
+      - ./backend/prisma:/app/prisma:ro
+      # Storage persistente para uploads (na VPS: /var/erp-uploads)
+      - /var/erp-uploads:/app/uploads
+    command: >
+      sh -c "
+        set -e &&
+        echo '⏳ Aguardando banco de dados...' &&
+        sleep 5 &&
+        echo '📦 Executando migrations...' &&
+        prisma migrate deploy &&
+        echo '🚀 Iniciando servidor...' &&
+        exec node dist/src/main.js
+      "
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    networks:
+      - erp-network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      # VPS: no .env use VITE_API_URL= ou VITE_API_URL=/api. Local Docker: use VITE_API_URL=http://localhost:3001
+      args:
+        VITE_API_URL: ${VITE_API_URL}
+    container_name: erp-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "${FRONTEND_PORT:-5174}:80"
+    networks:
+      - erp-network
+
+volumes:
+  db_data:
+    driver: local
+
+networks:
+  erp-network:
+    driver: bridge

@@ -1,0 +1,146 @@
+#page .course-card-view {
+    box-shadow: 5px 5px 9px -4px rgba($black, .1);
+    padding: 0 0 4rem;
+    min-width: 14rem;
+    overflow: hidden;
+    border: 1px solid $gray-100;
+    border-bottom: none;
+    transition: all .3s ease-in-out;
+
+    &:hover {
+        box-shadow: 6px 6px 10px -4px rgba($black, .2);
+
+        .course-card-img div {
+            transform: scale(1.05, 1.05);
+        }
+    }
+
+    .course-card-img div {
+        height: auto;
+        border: 0;
+        aspect-ratio: 7 / 4;
+        background-position: top right;
+        background-size: cover;
+        transition: all .3s ease-in-out;
+    }
+
+    .teachers {
+        font-size: .9rem;
+        padding: 0 .5rem;
+    }
+
+    .coursecat,
+    .card-body {
+        padding: 0 .5rem;
+    }
+
+    .card-course-link,
+    .card-see-more {
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+
+        .btn {
+            width: 90%;
+            white-space: normal;
+            line-height: 1.5rem;
+            padding: .5rem .75rem;
+            height: auto;
+        }
+    }
+
+    .enrolmenticon {
+        position: absolute;
+        background-color: rgba(255, 255, 255, .9);
+        top: 72px;
+        left: 8px;
+        border-radius: $softness;
+        .img,
+        .icon {
+            padding: 4px;
+            margin: 0;
+        }
+    }
+}
+
+body #page .card-see-more .btn {
+    line-height: 1.3rem;
+}
+
+body#page-enrol-index {
+    #page-content:before {
+        content: none;
+    }
+    &:not(.fullwidthgeneralbox) .box.generalbox > div {
+        @extend .course-card-view;
+        position: relative;
+    }
+    &.fullwidthgeneralbox {
+        .course-card-view,
+        .box.generalbox > div {
+            box-shadow: 5px 5px 9px -4px rgba($black, .1);
+            max-width: 100%;
+        }
+        .flex-grow-1 {
+            padding: 0 20px;
+        }
+        div.courseimage img {
+            max-width: 400px;
+        }
+    }
+}
+
+@media (max-width: 769px) {
+    #page {
+        .card-see-more .btn {
+            height: auto;
+            font-size: .7rem;
+        }
+        #frontpage-available-course-list {
+            h2 {
+                text-align: center;
+            }
+            .card-deck {
+                justify-content: center;
+                .course-card-view {
+                    width: 100%;
+                }
+            }
+        }
+    }
+    body#page-enrol-index #page-content #region-main {
+        padding: 10px 5px;
+        .generalbox.info {
+            div {
+                box-shadow: none;
+            }
+            .d-flex {
+                flex-direction: column;
+                .courseimage {
+                    text-align: center;
+                }
+                .courseimage,
+                .courseimage img,
+                .flex-grow-1 {
+                    padding: 10px 0;
+                    width: 100%;
+                }
+            }
+        }
+    }
+}
+
+.course-summaryitem .align-items-center {
+    align-items: normal!important
+}
+
+body #page .course-summaryitem {
+    a.aalink.coursename {
+        font-weight: bold;
+        font-size: large;
+    }
+    .categoryname {
+        font-size: small;
+        font-style: italic;
+    }
+}

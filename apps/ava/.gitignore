@@ -1,0 +1,35 @@
+# =============================================================================
+# Moodle AVA — o que NÃO vai para o GitHub
+# =============================================================================
+
+# Arquivos enviados pelo Moodle (videos, PDFs, cache, sessoes)
+moodledata/
+
+# Dump do banco local (dados sensiveis + arquivo grande)
+backup-moodle.sql
+*.sql
+
+# Senhas e configuracao sensivel (NUNCA commitar)
+.env
+.env.local
+.env.production
+
+# Modelo sem segredos — pode ir para o Git
+!.env.example
+
+# Logs
+*.log
+moodledata/cron.log
+
+# Sistema operacional / editores
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp
+*.swo
+*~
+
+# IDE
+.idea/
+.vscode/
+*.code-workspace

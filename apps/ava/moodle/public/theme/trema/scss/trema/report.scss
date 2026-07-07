@@ -1,0 +1,63 @@
+body.pagelayout-report,
+body.path-admin-reportbuilder,
+body#page-admin-setting-reportbuildersettings,
+body.path-admin-tool-mfa,
+body.path-admin-report-eventlist,
+body.path-report-participation,
+body.path-report-competency,
+body.path-admin-tool-brickfield,
+body.path-admin-tool-spamcleaner {
+    #page {
+        div.secondary-navigation {
+            max-width: none;
+            margin: 0 auto;
+            .navigation .nav-tabs {
+                margin: 0;
+            }
+        }
+        #page-header {
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+            width: 100%;
+            max-width: none;
+            padding: 0;
+        }
+        #page-content {
+            max-width: none;
+            padding: 0;
+            .reportbuilder-sidebar-settings {
+                right: 50px;
+            }
+            .dynamictabs {
+                height: auto;
+                .nav-tabs {
+                    width: calc(100% - 70px);
+                    background-color: transparent;
+                }
+            }
+            .reportbuilder-sidebar-menu-cards {
+                max-height: max-content;
+            }
+            .reportbuilder-report-container {
+                max-height: max-content;
+            }
+            @media (min-width: 992px) {
+                .dynamictabs {
+                    height: 87vh;
+                }
+                .reportbuilder-sidebar-menu-cards {
+                    max-height: calc(100vh - 335px);
+                }
+                .reportbuilder-report-container {
+                    max-height: calc(100vh - 215px);
+                }
+            }
+        }
+    }
+}
+
+#page-admin-reportbuilder-edit {
+    #page {
+        padding: 0 2rem;
+    }
+}

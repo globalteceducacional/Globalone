@@ -1,0 +1,5 @@
+pyserial
+pydub
+sounddevice
+ffmpeg-python
+numpy==1.26.4

@@ -1,0 +1,102 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template theme_trema/footer
+
+    Page footer.
+
+    Context variables required for this template:
+    * defaultfooter - The default footer content.
+    * footerinfo - Whether to show the footer info.
+    * output.page_doc_link - The page documentation link.
+    * output.services_support_link - The services support link.
+    * output.supportemail - The support email.
+    * output.login_info - The login info.
+    * output.standard_footer_html - The standard footer html.
+    * output.standard_end_of_body_html - The standard end of body html.
+    * output.moodle_release - The Moodle release.
+    * output.debug_footer_html - The debug footer html.
+    * showbranding - Whether to show the branding.
+
+    Example context (json):
+    {
+        "defaultfooter": "<p>Default footer content</p>",
+        "footerinfo": true,
+        "output": {
+            "page_doc_link": "<a href=\"#\">Page documentation</a>",
+            "services_support_link": "<a href=\"#\">Services support</a>",
+            "supportemail": "<a href=\"#\">Support email</a>",
+            "login_info": "<p>Login info</p>",
+            "standard_footer_html": "<p>Standard footer html</p>",
+            "standard_end_of_body_html": "<p>Standard end of body html</p>",
+            "moodle_release": "4.0.0",
+            "debug_footer_html": "<p>Debug footer html</p>"
+        },
+        "showbranding": true
+    }
+}}
+<footer id="page-footer" class="footer-trema">
+    <div class="container p-0">
+        <div class="row gtr-200 gtr-uniform">
+            <div class="col-12 footer-info p-0">
+                {{{defaultfooter}}}
+            </div>
+
+            {{# output.page_doc_link }}
+                <div class="helplink col-12 text-center col-12-medium col-12-xsmall footer-info smalltext {{^footerinfo}}d-none{{/footerinfo}}">
+                    {{{ output.page_doc_link }}}
+                </div>
+            {{/ output.page_doc_link }}
+            {{# output.services_support_link }}
+                <div class="service_support col-12 text-center col-12-medium col-12-xsmall footer-info smalltext {{^footerinfo}}d-none{{/footerinfo}}">
+                    {{{ output.services_support_link }}}
+                </div>
+            {{/ output.services_support_link }}
+            {{# output.supportemail }}
+                <div class="supportemail col-12 text-center col-12-medium col-12-xsmall footer-info smalltext {{^footerinfo}}d-none{{/footerinfo}}">
+                    {{{ output.supportemail }}}
+                </div>
+            {{/ output.supportemail }}
+            <div class="col-12 text-center col-12-medium col-12-xsmall footer-info smalltext {{^footerinfo}}d-none{{/footerinfo}}">
+                <div class="logininfo">
+                    {{{ output.login_info }}}
+                </div>
+                <div class="col-12 text-center col-12-medium col-12-xsmall footer-info">
+                    <div class="tool_usertours-resettourcontainer"></div>
+                </div>
+                {{{ output.standard_footer_html }}}
+                {{{ output.standard_end_of_body_html }}}
+                <div class="footer-section p-3">
+                    <div>{{#str}}poweredbymoodle, core{{/str}}</div>
+                    {{#output.moodle_release}}
+                        <div>
+                            {{#str}}version, core{{/str}} {{{ output.moodle_release }}}
+                        </div>
+                    {{/output.moodle_release}}
+                </div>
+                <div class="footer-content-debugging py-sm-3">
+                    <div class="container">
+                        {{{ output.debug_footer_html }}}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {{#showbranding}}
+        <div class="copyleft"><span>&copy;</span>{{#str}}footertitle, theme_trema{{/str}}</div>
+    {{/showbranding}}
+</footer>

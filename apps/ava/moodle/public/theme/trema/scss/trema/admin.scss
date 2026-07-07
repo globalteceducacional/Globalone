@@ -1,0 +1,168 @@
+body.path-admin {
+    .header-maxwidth {
+        max-width: $course-content-maxwidth;
+        margin: 0 auto;
+        padding: 0;
+    }
+
+    #page.drawers #topofscroll {
+        padding-top: 0;
+        background-color: transparent;
+    }
+
+    .secondary-navigation {
+        padding: 1rem 0;
+        width: calc(100% - 6rem);
+        margin: 0 auto;
+        max-width: $course-content-maxwidth;
+    }
+
+    #page-content {
+        &.d-print-block {
+            margin: 0 3rem;
+        }
+    }
+
+    #region-main {
+        padding: 1.5rem;
+        overflow: visible;
+    }
+
+    #region-main-box {
+        padding: 0;
+    }
+}
+
+body.path-admin {
+    #region-main {
+        @extend %border-frequency;
+        &:before {
+            height: 1rem;
+            top: -1rem;
+        }
+        &:after {
+            height: 0.15rem;
+        }
+    }
+}
+
+body#page-search-index {
+    #region-main {
+        padding: 2rem;
+        @extend %border-frequency;
+        &:before {
+            content: none;
+        }
+        &:after {
+            height: 0.15rem;
+        }
+    }
+}
+
+body.path-cohort,
+body.path-badges,
+body.pagelayout-admin {
+    #region-main {
+        padding: 2rem;
+        @extend %border-frequency;
+        &:before {
+            height: 1rem;
+            top: -1rem;
+        }
+        &:after {
+            height: 0.15rem;
+        }
+    }
+}
+
+body.path-badges {
+    #page {
+        #page-header {
+            background-color: $white;
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+            @extend %border-frequency;
+        }
+    }
+}
+
+#page-badges-award .recipienttable tr td.actions .actionbutton {
+    padding: 0;
+}
+
+body.path-admin.pagelayout-maintenance {
+    #region-main {
+        &:before {
+            content: none;
+        }
+        &:after {
+            content: none;
+        }
+    }
+}
+
+#page-admin-search {
+    .simplesearchform {
+        input.form-control[type='text'] {
+            width: auto;
+            color: choose-contrast-color($white);
+            background-color: $white;
+        }
+        [type='submit'] {
+            margin: 0 0.5rem;
+            background-color: $primary;
+            color: choose-contrast-color($primary);
+        }
+    }
+
+    #page-header {
+        max-width: none;
+        padding: 0;
+        margin: 0 auto;
+    }
+
+    #page-content {
+        margin: 0;
+
+        h4 {
+            font-size: 1.4rem;
+        }
+    }
+}
+
+body.path-admin-report-log {
+    #page form {
+        .custom-select,
+        .form-select {
+            width: auto;
+            display: inline-block;
+        }
+    }
+}
+
+// Show more content on some pages that have wide tables
+body#page-mod-assign-grading #page-content,
+body#page-mod-assign-grading #page-content,
+body#page-admin-tool-task-scheduledtasks #page-content,
+body#page-question-edit #page-content {
+    max-width: 100%;
+    .generaltable th,
+    .generaltable td {
+        padding: .75rem 0;
+    }
+}
+
+// Right align the Search Courses form in Manage Courses and Categories.
+// This will be fixed in MDL-85354.
+body#page-course-management .navitem:last-child {
+    margin-left: auto;
+}
+
+body.path-admin #page-header,
+body.path-admin #page #page-header,
+body.path-admin .secondary-navigation,
+body.path-admin #page #page-content,
+body.path-admin div#page div.secondary-navigation {
+    width: 100%;
+    max-width: 100%;
+}

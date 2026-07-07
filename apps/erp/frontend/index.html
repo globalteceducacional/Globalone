@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Impedir que o app seja embutido em iframes de outros domínios -->
+    <meta http-equiv="X-Frame-Options" content="DENY" />
+    <!-- Evitar sniffing de MIME type -->
+    <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+    <!-- Política de referrer: não vazar URL em requisições cross-origin -->
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <!-- CSP: alinhada ao Nginx; blob: e unsafe-eval necessários para viewers de documento -->
+    <!-- CSP: viewers (blob:) + mapa geocerca OSM + ponto (Permissions-Policy no Nginx) -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://*.tile.openstreetmap.org; font-src 'self' data:; connect-src 'self' blob: data: https://nominatim.openstreetmap.org; frame-src 'self' blob: data:; worker-src 'self' blob:; frame-ancestors 'none'; object-src 'self' blob: data:;" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <title>ERP Globaltec</title>
+  </head>
+  <body class="bg-neutral text-white">
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

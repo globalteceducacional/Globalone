@@ -1,0 +1,1634 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Configuração do seed
+// Execute: npx prisma db seed
+
+model Cargo {
+  id                Int               @id @default(autoincrement())
+  nome              String            @unique
+  descricao         String?
+  ativo             Boolean           @default(true)
+  paginasPermitidas Json? // Array de strings com as rotas permitidas: ["/dashboard", "/projects", ...]
+  dataCriacao       DateTime          @default(now())
+  usuarios          Usuario[]
+  permissions       CargoPermission[]
+  treinamentosObrigatorios CargoTreinamento[]
+
+  @@map("Cargo")
+}
+
+enum ProjetoStatus {
+  EM_ANDAMENTO
+  FINALIZADO
+}
+
+enum EtapaStatus {
+  PENDENTE
+  EM_ANDAMENTO
+  EM_ANALISE
+  APROVADA
+  REPROVADA
+}
+
+enum EtapaEntregaStatus {
+  EM_ANALISE
+  APROVADA
+  RECUSADA
+}
+
+enum ChecklistItemStatus {
+  PENDENTE
+  EM_ANALISE
+  APROVADO
+  REPROVADO
+}
+
+enum SubetapaStatus {
+  PENDENTE
+  EM_ANDAMENTO
+  CONCLUIDA
+}
+
+enum CompraStatus {
+  SOLICITADO
+  REPROVADO
+  PENDENTE
+  COMPRADO_ACAMINHO
+  ENTREGUE
+}
+
+/// Classe do lançamento: estoque (almoxarifado), despesa avulsa ou assinatura mensal.
+enum CompraClasse {
+  ESTOQUE
+  DESPESA
+  ASSINATURA
+}
+
+enum StatusEntrega {
+  NAO_ENTREGUE
+  PARCIAL
+  ENTREGUE
+  CANCELADO
+}
+
+enum EstoqueStatus {
+  DISPONIVEL
+  ALOCADO
+  RESERVADO
+}
+
+enum NotificacaoTipo {
+  INFO
+  SUCCESS
+  WARNING
+  ERROR
+}
+
+/// Público-alvo do evento extra do calendário (fora de etapas de projeto).
+enum CalendarioEventoAlvo {
+  TODOS_USUARIOS
+  SELECIONADOS
+}
+
+enum RequerimentoTipo {
+  SOLICITACAO
+  APROVACAO
+  INFORMACAO
+  RECLAMACAO
+  SUGESTAO
+  COMPRA
+  OUTRO
+}
+
+enum CategoriaCompraTipo {
+  ITEM
+  LIVRO
+}
+
+enum GalpaoLivroMovimentoTipo {
+  ENTRADA
+  BAIXA
+}
+
+/// Insumos, equipamentos e ferramentas do setor (patrimônio material).
+enum SetorPatrimonioMaterialCategoria {
+  INSUMO
+  EQUIPAMENTO
+  FERRAMENTA
+}
+
+/// Licenças, softwares e demais ativos imateriais do setor.
+enum SetorPatrimonioImaterialTipo {
+  LICENCA
+  SOFTWARE
+  CONTEUDO_IMATERIAL
+}
+
+/// Tipo da batida de ponto registrada por um usuário.
+enum TipoBatida {
+  ENTRADA
+  SAIDA
+}
+
+/// Origem do registro de ponto: marcação normal feita pelo colaborador
+/// ou ajuste retroativo feito pelo RH com justificativa.
+enum OrigemPonto {
+  NORMAL
+  AJUSTE_RH
+}
+
+/// Estado das solicitações de RH (ajustes de ponto, férias, etc.).
+enum SolicitacaoStatus {
+  PENDENTE
+  APROVADO
+  REPROVADO
+  CANCELADO
+}
+
+/// Categoria do lançamento de banco de horas para fins de relatório.
+enum BancoHorasOrigem {
+  PONTO
+  AJUSTE
+  COMPENSACAO
+  FECHAMENTO
+}
+
+/// Tipo de afastamento (atestado, licença, falta abonada).
+enum AfastamentoTipo {
+  ATESTADO
+  LICENCA
+  FALTA_ABONADA
+  HOME_OFFICE
+  OUTRO
+}
+
+/// Categoria de documento do colaborador.
+enum DocumentoColaboradorTipo {
+  CONTRATO
+  ASO
+  RG
+  CPF
+  COMPROVANTE_RESIDENCIA
+  CERTIFICADO
+  CARTEIRA_TRABALHO
+  OUTRO
+}
+
+/// Estado do ciclo de avaliação de desempenho.
+enum CicloAvaliacaoStatus {
+  PLANEJAMENTO
+  ABERTO
+  ENCERRADO
+}
+
+/// Estado da resposta de uma avaliação de desempenho.
+enum AvaliacaoStatus {
+  PENDENTE
+  RESPONDIDA
+  REVISADA
+}
+
+/// Estado da matrícula em treinamento.
+enum MatriculaTreinamentoStatus {
+  PENDENTE
+  EM_ANDAMENTO
+  CONCLUIDO
+  REPROVADO
+}
+
+/// Etapa da trilha do treinamento (vídeo ou questão).
+enum TreinamentoItemTipo {
+  VIDEO
+  QUESTAO
+}
+
+model Usuario {
+  id                          Int                    @id @default(autoincrement())
+  nome                        String
+  fotoUrl                     String? // URL pública: /uploads/profiles/...
+  dataNascimento              DateTime?
+  formacao                    String?
+  /// Resumo da biografia (editável pelo próprio usuário no perfil).
+  biografiaResumo             String?                @db.Text
+  /// Habilidades (texto livre; ex.: lista separada por vírgulas).
+  habilidades                 String?                @db.Text
+  linkLattes                  String?
+  linkPortfolio               String?
+  linkLinkedin                String?
+  /// Contato adicional (e-mail alternativo, horários, etc.); telefone permanece em `telefone`.
+  dadosContato                String?                @db.Text
+  /// Chave PIX ou identificador informado pelo colaborador (uso em RH / pagamentos).
+  pix                         String?                @db.Text
+  /// Endereço (residencial ou correspondência; texto livre).
+  endereco                    String?                @db.Text
+  /// CPF (somente dígitos). Necessário para AFD/REP-P (Portaria 671/2021).
+  cpf                         String?                @unique
+  /// Data de entrada na empresa / no sistema.
+  dataEntrada                 DateTime?
+  funcao                      String?
+  cargoId                     Int
+  cargo                       Cargo                  @relation(fields: [cargoId], references: [id])
+  email                       String                 @unique
+  telefone                    String?
+  senha                       String
+  comprasSolicitadas          Compra[]               @relation("SolicitadoPor")
+  ativo                       Boolean                @default(false)
+  dataCadastro                DateTime               @default(now())
+  projetosResponsavel         ProjetoResponsavel[]
+  projetosResponsavelExcluidos ProjetoResponsavelExcluido[]
+  projetos                    Projeto[]              @relation("Supervisor")
+  etapasExecutadas            Etapa[]                @relation("Executor")
+  etapasComoResponsavel       Etapa[]                @relation("ResponsavelEtapa")
+  etapasIntegrantes           EtapaIntegrante[]
+  ocorrenciasEnviadas         Ocorrencia[]           @relation("OcorrenciasEnviadas")
+  ocorrenciasRecebidas        Ocorrencia[]           @relation("OcorrenciasRecebidas")
+  requerimentosEnviados       Requerimento[]         @relation("RequerimentosEnviados")
+  requerimentosRecebidos      Requerimento[]         @relation("RequerimentosRecebidos")
+  notificacoes                Notificacao[]
+  pushSubscriptions           PushSubscription[]
+  entregasExecutadas          EtapaEntrega[]         @relation("EtapaEntregaExecutor")
+  entregasAvaliadas           EtapaEntrega[]         @relation("EtapaEntregaAvaliador")
+  entregasEditadas            EtapaEntrega[]         @relation("EtapaEntregaEditor")
+  checklistEntregasExecutadas ChecklistItemEntrega[] @relation("ChecklistItemEntregaExecutor")
+  checklistEntregasAvaliadas  ChecklistItemEntrega[] @relation("ChecklistItemEntregaAvaliador")
+  estoqueAlocacoes            EstoqueAlocacao[]
+  curadoriaOrcamentos         CuradoriaOrcamento[]
+  setores                     SetorUsuario[]
+  avariasOutrosItensCriadas  GalpaoOutroItemAvaria[]
+  avariasLivrosCriadas       GalpaoLivroAvaria[]
+  /// Soma dos pontos de tarefas de checklist aprovadas (mantido ao aprovar/reabrir entregas).
+  pontosTarefas              Int                    @default(0)
+  calendarioEventosCriados      CalendarioEvento[]            @relation("CalendarioEventoCriador")
+  calendarioEventoParticipacoes CalendarioEventoParticipante[]
+  setoresComoChefe              Setor[]                       @relation("SetorChefe")
+  patrimonioMaterialAtribuido   SetorPatrimonioMaterial[]     @relation("PatrimonioMaterialAtribuido")
+  assinaturasMesConfirmadas     CompraAssinaturaMes[]         @relation("AssinaturaMesConfirmadoPor")
+  registrosPonto                RegistroPonto[]               @relation("RegistroPontoUsuario")
+  registrosPontoAjustados       RegistroPonto[]               @relation("RegistroPontoAjustador")
+  jornada                       JornadaTrabalho?
+  solicitacoesAjustePonto       SolicitacaoAjustePonto[]      @relation("SolicitacaoAjusteAutor")
+  solicitacoesAjusteRevisadas   SolicitacaoAjustePonto[]      @relation("SolicitacaoAjusteRevisor")
+  bancoHorasLancamentos         BancoHorasLancamento[]        @relation("BancoHorasUsuario")
+  bancoHorasFechamentos         BancoHorasFechamento[]        @relation("BancoHorasUsuarioFech")
+  bancoHorasFechamentosFeitos   BancoHorasFechamento[]        @relation("BancoHorasFechamentoPor")
+  periodosAquisitivos           PeriodoAquisitivo[]
+  feriasSolicitacoes            FeriasSolicitacao[]            @relation("FeriasSolicitacaoUsuario")
+  feriasRevisadas               FeriasSolicitacao[]            @relation("FeriasSolicitacaoRevisor")
+  afastamentos                  Afastamento[]                  @relation("AfastamentoUsuario")
+  afastamentosRegistrados       Afastamento[]                  @relation("AfastamentoRegistradoPor")
+  documentosColaborador         DocumentoColaborador[]         @relation("DocumentoColaboradorUsuario")
+  documentosUploadFeitos        DocumentoColaborador[]         @relation("DocumentoColaboradorUploadPor")
+  ciclosCriados                 CicloAvaliacao[]               @relation("CicloAvaliacaoCriador")
+  avaliacoesRecebidas           AvaliacaoDesempenho[]          @relation("AvaliacaoDesempenhoAvaliado")
+  avaliacoesFeitas              AvaliacaoDesempenho[]          @relation("AvaliacaoDesempenhoAvaliador")
+  metasIndividuais              MetaIndividual[]
+  treinamentosCriados           Treinamento[]                  @relation("TreinamentoCriador")
+  treinamentoMatriculas         TreinamentoMatricula[]
+  /// RH: permite ao colaborador solicitar débito de horas extras no banco, até o limite configurado.
+  bancoHorasExtrasUsoPermitido     Boolean @default(false)
+  /// Máximo de minutos em solicitações pendentes + aprovadas (uso de extras autorizado pelo RH).
+  bancoHorasExtrasUsoLimiteMinutos   Int?
+  bancoHorasUsoExtrasSolicitacoes    BancoHorasUsoExtrasSolicitacao[] @relation("BancoHorasUsoExtrasUsuario")
+  bancoHorasUsoExtrasRevisadas       BancoHorasUsoExtrasSolicitacao[] @relation("BancoHorasUsoExtrasRevisor")
+
+  bancoHorasFechamentoLogsExec       BancoHorasFechamentoLog[]        @relation("BancoHorasFechamentoLogExec")
+  bancoHorasReaberturasComoAdmin     BancoHorasReaberturaDesafio[]    @relation("BHReabDesafioAdmin")
+  bancoHorasReaberturasComoAlvo      BancoHorasReaberturaDesafio[]    @relation("BHReabDesafioAlvo")
+  feriadosCriados                      Feriado[]                        @relation("FeriadoCriador")
+  documentosGlobaltec                  DocumentoGlobaltec[]             @relation("DocumentoCriador")
+  documentosConfidencialidade          DocumentoGlobaltec[]             @relation("DocumentoSignatario")
+  documentoConvites                    DocumentoConvite[]               @relation("DocumentoConviteCriador")
+  documentoConvitesRecebidos           DocumentoConvite[]               @relation("DocumentoConviteSignatario")
+  patentesDocumentosCriados            DocumentoPatenteAplicacao[]      @relation("PatenteDocumentoCriador")
+  patentesPastasCriadas                PatenteDocumentoPasta[]          @relation("PatentePastaCriador")
+}
+
+model Setor {
+  id                Int            @id @default(autoincrement())
+  nome              String         @unique
+  descricao         String?
+  ativo             Boolean        @default(true)
+  chefeId           Int?
+  chefe             Usuario?       @relation("SetorChefe", fields: [chefeId], references: [id], onDelete: SetNull)
+  dataCriacao       DateTime       @default(now())
+  dataAtualizacao   DateTime       @updatedAt
+  membros           SetorUsuario[]
+  projetos          Projeto[]     @relation("ProjetoSetores")
+  etapas            Etapa[]       @relation("EtapaSetores")
+  compras           Compra[]
+  curadoriaOrcamentos CuradoriaOrcamento[]
+  estoqueAlocacoes  EstoqueAlocacao[]
+  patrimonioMaterial   SetorPatrimonioMaterial[]
+  patrimonioImaterial  SetorPatrimonioImaterial[]
+
+  @@index([chefeId])
+}
+
+model SetorPatrimonioMaterial {
+  id                 Int                           @id @default(autoincrement())
+  setorId            Int
+  setor              Setor                         @relation(fields: [setorId], references: [id], onDelete: Cascade)
+  /// Item do estoque corporativo (Compras & Estoque). Quando preenchido, nome/valor podem espelhar o cadastro do estoque na UI.
+  estoqueId          Int?
+  estoque            Estoque?                      @relation(fields: [estoqueId], references: [id], onDelete: SetNull)
+  categoria          SetorPatrimonioMaterialCategoria
+  nome               String
+  quantidade         Int?
+  unidade            String?
+  especificacao      String?                       @db.Text
+  localizacao        String?                       @db.Text
+  usuarioAtribuidoId Int?
+  usuarioAtribuido   Usuario?                      @relation("PatrimonioMaterialAtribuido", fields: [usuarioAtribuidoId], references: [id], onDelete: SetNull)
+  ordem              Int                           @default(0)
+  dataCriacao        DateTime                      @default(now())
+  dataAtualizacao    DateTime                      @updatedAt
+
+  @@index([setorId])
+  @@index([usuarioAtribuidoId])
+  @@index([estoqueId])
+}
+
+model SetorPatrimonioImaterial {
+  id              Int                          @id @default(autoincrement())
+  setorId         Int
+  setor           Setor                        @relation(fields: [setorId], references: [id], onDelete: Cascade)
+  tipo            SetorPatrimonioImaterialTipo
+  nome            String
+  descricao       String?                      @db.Text
+  fornecedor      String?
+  dataValidade    DateTime?
+  observacoes     String?                      @db.Text
+  ordem           Int                          @default(0)
+  dataCriacao     DateTime                     @default(now())
+  dataAtualizacao DateTime                     @updatedAt
+
+  @@index([setorId])
+}
+
+model SetorUsuario {
+  setorId   Int
+  usuarioId Int
+  setor     Setor   @relation(fields: [setorId], references: [id], onDelete: Cascade)
+  usuario   Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  @@id([setorId, usuarioId])
+  @@index([usuarioId])
+}
+
+model Projeto {
+  id                  Int                  @id @default(autoincrement())
+  nome                String               @unique
+  resumo              String?
+  objetivo            String?
+  descricaoLonga      String?
+  descricaoArquivos   Json?
+  valorTotal          Float                @default(0)
+  valorInsumos        Float                @default(0)
+  status              ProjetoStatus        @default(EM_ANDAMENTO)
+  dataCriacao         DateTime             @default(now())
+  dataFinalizacao     DateTime?
+  planilhaJson        Json?
+  supervisorId        Int?
+  supervisor          Usuario?             @relation("Supervisor", fields: [supervisorId], references: [id])
+  setores             Setor[]             @relation("ProjetoSetores")
+  sessoes             Sessao[]
+  etapas              Etapa[]
+  responsaveis        ProjetoResponsavel[]
+  responsaveisExcluidos ProjetoResponsavelExcluido[]
+  compras             Compra[]
+  curadoriaOrcamentos CuradoriaOrcamento[]
+  estoqueItems        Estoque[]
+  estoqueAlocacoes    EstoqueAlocacao[]
+  avariasLivros       GalpaoLivroAvaria[]
+  calendarioEventos   CalendarioEvento[]
+}
+
+enum CuradoriaDescontoAplicadoEm {
+  ITEM
+  TOTAL
+}
+
+model CuradoriaOrcamento {
+  id                      Int                         @id @default(autoincrement())
+  nome                    String
+  observacao              String?
+  nfUrl                   String?
+  arquivoOrcamentoUrl     String?
+  comprovantePagamentoUrl String?
+  formaPagamento          String?
+  status                  CompraStatus                @default(PENDENTE)
+  descontoAplicadoEm      CuradoriaDescontoAplicadoEm @default(ITEM)
+  descontoTotal           Float                       @default(0)
+  projetoId               Int?
+  projeto                 Projeto?                    @relation(fields: [projetoId], references: [id], onDelete: SetNull)
+  setorId                 Int?
+  setor                   Setor?                      @relation(fields: [setorId], references: [id], onDelete: SetNull)
+  fornecedorId            Int?
+  fornecedor              Fornecedor?                 @relation(fields: [fornecedorId], references: [id], onDelete: SetNull)
+  criadoPorId             Int?
+  criadoPor               Usuario?                    @relation(fields: [criadoPorId], references: [id], onDelete: SetNull)
+  dataCriacao             DateTime                    @default(now())
+  dataAtualizacao         DateTime                    @updatedAt
+  itens                   CuradoriaItem[]
+
+  @@index([projetoId])
+  @@index([setorId])
+  @@index([criadoPorId])
+  @@index([fornecedorId])
+}
+
+model CuradoriaItem {
+  id            Int                @id @default(autoincrement())
+  orcamentoId   Int
+  orcamento     CuradoriaOrcamento @relation(fields: [orcamentoId], references: [id], onDelete: Cascade)
+  nome          String
+  isbn          String
+  quantidade    Int                @default(1)
+  categoriaId   Int?
+  categoria     CategoriaCompra?   @relation(fields: [categoriaId], references: [id], onDelete: SetNull)
+  valor         Float
+  desconto      Float              @default(0)
+  valorLiquido  Float
+  autor         String?
+  editora       String?
+  anoPublicacao String?
+  dataCriacao   DateTime           @default(now())
+
+  @@index([orcamentoId])
+  @@index([categoriaId])
+}
+
+model Sessao {
+  id        Int     @id @default(autoincrement())
+  projetoId Int
+  nome      String // Ex.: "Módulo 1", "Fase Inicial"
+  ordem     Int     @default(0) // Ordem de exibição no projeto
+  projeto   Projeto @relation(fields: [projetoId], references: [id], onDelete: Cascade)
+  etapas    Etapa[]
+
+  @@index([projetoId])
+  @@map("Sessao")
+}
+
+model ProjetoResponsavel {
+  projetoId Int
+  usuarioId Int
+  projeto   Projeto @relation(fields: [projetoId], references: [id], onDelete: Cascade)
+  usuario   Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  @@id([projetoId, usuarioId])
+}
+
+// Guarda quais membros vindos automaticamente dos setores NÃO devem ser reaplicados como
+// "responsáveis" do projeto quando os setores continuam selecionados.
+model ProjetoResponsavelExcluido {
+  projetoId Int
+  usuarioId Int
+
+  projeto Projeto @relation(fields: [projetoId], references: [id], onDelete: Cascade)
+  usuario Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  @@id([projetoId, usuarioId])
+}
+
+model EtapaIntegrante {
+  etapaId   Int
+  usuarioId Int
+  /// Índices (0-based) dos itens principais do checklistJson atribuídos a este integrante.
+  /// null = todos os itens (comportamento legado). [] = nenhum item atribuído.
+  checklistItemIndices Json?
+  etapa                Etapa   @relation(fields: [etapaId], references: [id], onDelete: Cascade)
+  usuario              Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  @@id([etapaId, usuarioId])
+}
+
+model Etapa {
+  id                Int                    @id @default(autoincrement())
+  ordem             Int                    @default(0) // Ordem de exibição no projeto
+  nome              String
+  descricao         String?
+  sessaoId          Int? // Sessão (ex.: Módulo 1) -> abas -> etapas
+  aba               String? // Nome da aba/grupo (ex.: "Software", "Hardware")
+  status            EtapaStatus            @default(PENDENTE)
+  dataInicio        DateTime?
+  dataFim           DateTime?
+  valorInsumos      Float                  @default(0)
+  iniciada          Boolean                @default(false)
+  checklistJson     Json? // Array de itens do checklist: [{ texto: string, concluido: boolean }]
+  projetoId         Int
+  projeto           Projeto                @relation(fields: [projetoId], references: [id], onDelete: Cascade)
+  sessao            Sessao?                @relation(fields: [sessaoId], references: [id], onDelete: SetNull)
+  executorId        Int
+  executor          Usuario                @relation("Executor", fields: [executorId], references: [id])
+  responsavelId     Int?
+  responsavel       Usuario?               @relation("ResponsavelEtapa", fields: [responsavelId], references: [id], onDelete: SetNull)
+  setores           Setor[]               @relation("EtapaSetores")
+  integrantes       EtapaIntegrante[]
+  subetapas         Subetapa[]
+  requerimentos     Requerimento[]
+  estoqueItens      Estoque[]
+  entregas          EtapaEntrega[]
+  checklistEntregas ChecklistItemEntrega[]
+  compras           Compra[]
+  estoqueAlocacoes  EstoqueAlocacao[]
+  Notificacao       Notificacao[]
+}
+
+model EtapaEntrega {
+  id            Int                @id @default(autoincrement())
+  descricao     String
+  imagemUrl     String?
+  status        EtapaEntregaStatus @default(EM_ANALISE)
+  dataEnvio     DateTime           @default(now())
+  comentario    String?
+  etapaId       Int
+  executorId    Int
+  avaliadoPorId Int?
+  dataAvaliacao DateTime?
+  foiEditada    Boolean            @default(false)
+  editadoPorId  Int?
+  dataEdicao    DateTime?
+
+  etapa       Etapa    @relation(fields: [etapaId], references: [id], onDelete: Cascade)
+  executor    Usuario  @relation("EtapaEntregaExecutor", fields: [executorId], references: [id])
+  avaliadoPor Usuario? @relation("EtapaEntregaAvaliador", fields: [avaliadoPorId], references: [id])
+  editadoPor  Usuario? @relation("EtapaEntregaEditor", fields: [editadoPorId], references: [id])
+}
+
+model ChecklistItemEntrega {
+  id                Int                 @id @default(autoincrement())
+  etapaId           Int
+  checklistIndex    Int // Índice do item no array checklistJson
+  subitemIndex      Int? // Índice do subitem (null se for entrega do item principal)
+  /// Id estável da tarefa em checklistJson — vínculo de entrega/anexos ao remapear índices.
+  checklistItemId   String?
+  /// Id estável da subtarefa em checklistJson[].subitens (null = entrega do item principal).
+  subitemId         String?
+  descricao         String
+  imagemUrl         String? // Mantido para compatibilidade (deprecated)
+  documentoUrl      String? // Mantido para compatibilidade (deprecated)
+  imagensUrls       Json? // Array de URLs/imagens (base64 ou URLs)
+  documentosUrls    Json? // Array de URLs/documentos (base64 ou URLs)
+  arquivosRemovidos Json? // Array de URLs de arquivos antigos para apagar do storage após aprovação
+  status            ChecklistItemStatus @default(PENDENTE)
+  dataEnvio         DateTime            @default(now())
+  comentario        String?
+  executorId        Int
+  avaliadoPorId     Int?
+  dataAvaliacao     DateTime?
+  /// Pontos concedidos nesta entrega quando aprovada (snapshot; padrão 1 se não houver pontos no JSON).
+  pontosAtribuidos  Int?
+
+  etapa       Etapa    @relation(fields: [etapaId], references: [id], onDelete: Cascade)
+  executor    Usuario  @relation("ChecklistItemEntregaExecutor", fields: [executorId], references: [id])
+  avaliadoPor Usuario? @relation("ChecklistItemEntregaAvaliador", fields: [avaliadoPorId], references: [id])
+
+  @@unique([etapaId, checklistIndex, subitemIndex])
+  @@index([etapaId])
+  @@index([executorId])
+  @@map("ChecklistItemEntrega")
+}
+
+model Permission {
+  id        Int               @id @default(autoincrement())
+  modulo    String
+  acao      String
+  descricao String?
+  cargos    CargoPermission[]
+
+  @@unique([modulo, acao])
+}
+
+model CargoPermission {
+  cargoId      Int
+  permissionId Int
+  cargo        Cargo      @relation(fields: [cargoId], references: [id], onDelete: Cascade)
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@id([cargoId, permissionId])
+}
+
+model Subetapa {
+  id         Int            @id @default(autoincrement())
+  nome       String
+  descricao  String?
+  status     SubetapaStatus @default(PENDENTE)
+  dataInicio DateTime?
+  dataFim    DateTime?
+  etapaId    Int
+  etapa      Etapa          @relation(fields: [etapaId], references: [id], onDelete: Cascade)
+}
+
+model Compra {
+  id                      Int              @id @default(autoincrement())
+  item                    String
+  descricao               String? // Motivo da solicitação
+  quantidade              Int
+  valorUnitario           Float? // Valor unitário da cotação selecionada (opcional para solicitações)
+  imagemUrl               String?
+  cotacoesJson            Json? // Array de cotações: [{ valorUnitario, frete, impostos, link, fornecedorId }]
+  /// Preenchido ao aprovar solicitação (SOLICITADO → PENDENTE); permite revisar aprovação e notificar o solicitante.
+  solicitacaoAprovadaEm   DateTime?
+  /// Índice da cotação escolhida em `cotacoesJson` (para diff ao revisar).
+  cotacaoSelecionadaIndex Int?
+  status                  CompraStatus     @default(PENDENTE)
+  classe                  CompraClasse     @default(ESTOQUE)
+  dataSolicitacao         DateTime         @default(now())
+  dataConfirmacao         DateTime?
+  dataCompra              DateTime? // Data em que a compra foi realizada
+  nfUrl                   String? // URL da Nota Fiscal (base64 ou URL)
+  comprovantePagamentoUrl String? // URL do comprovante de pagamento (base64 ou URL)
+  projetoId               Int?
+  projeto                 Projeto?         @relation(fields: [projetoId], references: [id], onDelete: Cascade)
+  etapaId                 Int?
+  etapa                   Etapa?           @relation(fields: [etapaId], references: [id], onDelete: SetNull)
+  setorId                 Int?
+  setor                   Setor?           @relation(fields: [setorId], references: [id], onDelete: SetNull)
+  solicitadoPorId         Int?
+  solicitadoPor           Usuario?         @relation("SolicitadoPor", fields: [solicitadoPorId], references: [id], onDelete: SetNull)
+  motivoRejeicao          String? // Motivo da rejeição quando status for REPROVADO
+  categoriaId             Int?
+  categoria               CategoriaCompra? @relation(fields: [categoriaId], references: [id], onDelete: SetNull)
+  formaPagamento          String? // Forma de pagamento: Cartão de Crédito, Pix, Bônus, Boleto, etc.
+  statusEntrega           StatusEntrega? // Status de entrega: NAO_ENTREGUE, PARCIAL, ENTREGUE, CANCELADO
+  previsaoEntrega         DateTime? // Previsão de entrega (quando status for COMPRADO_ACAMINHO)
+  dataEntrega             DateTime? // Data da entrega
+  enderecoEntrega         String? // Endereço de entrega
+  recebidoPor             String? // Nome de quem recebeu o material
+  observacao              String? // Observações gerais
+  pagoPorJson             Json? // Quem/método do pagamento: [{ tipo: usuario|pessoa|metodo, ... }]
+  tagsJson                Json? // Tags da compra: [{ nome, cor }]
+  /// Mês confirmado para assinaturas no formato YYYY-MM (ex.: 2026-04).
+  assinaturaConfirmadaMes String?          @db.VarChar(7)
+  estoqueEntrada          EstoqueEntrada?
+  assinaturaMeses         CompraAssinaturaMes[]
+
+  @@index([setorId])
+}
+
+/// Competência mensal de assinatura: NF e comprovante por mês (YYYY-MM), com histórico.
+model CompraAssinaturaMes {
+  id                      Int      @id @default(autoincrement())
+  compraId                Int
+  compra                  Compra   @relation(fields: [compraId], references: [id], onDelete: Cascade)
+  mesReferencia           String   @db.VarChar(7)
+  nfUrl                   String?
+  comprovantePagamentoUrl String?
+  confirmadoEm            DateTime @default(now())
+  confirmadoPorId         Int?
+  confirmadoPor           Usuario? @relation("AssinaturaMesConfirmadoPor", fields: [confirmadoPorId], references: [id], onDelete: SetNull)
+  observacao              String?  @db.Text
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+
+  @@unique([compraId, mesReferencia])
+  @@index([mesReferencia])
+  @@map("CompraAssinaturaMes")
+}
+
+/// Métodos de pagamento reutilizáveis em «Pago por» (ex.: cartão de emergência, PIX empresa).
+model MetodoPagoCompra {
+  id        Int      @id @default(autoincrement())
+  nome      String   @unique @db.VarChar(200)
+  ativo     Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  @@map("MetodoPagoCompra")
+}
+
+model Estoque {
+  id            Int               @id @default(autoincrement())
+  item          String
+  descricao     String?
+  quantidade    Int // Quantidade total disponível no estoque
+  valorUnitario Float
+  imagemUrl     String?
+  /// Última NF / comprovante conhecidos (compra entregue ou cadastro manual no item).
+  nfUrl                   String?
+  comprovantePagamentoUrl String?
+  cotacoesJson  Json? // Array de cotações: [{ valorUnitario, frete, impostos, link }]
+  status        EstoqueStatus     @default(DISPONIVEL)
+  projetoId     Int?
+  projeto       Projeto?          @relation(fields: [projetoId], references: [id])
+  etapaId       Int?
+  etapa         Etapa?            @relation(fields: [etapaId], references: [id])
+  categoriaId   Int?
+  categoria     CategoriaCompra?  @relation(fields: [categoriaId], references: [id], onDelete: SetNull)
+  alocacoes     EstoqueAlocacao[] // Alocações deste item para projetos/etapas
+  entradas      EstoqueEntrada[] // Histórico de entradas a partir de compras entregues
+  galpaoOutroItemAvarias GalpaoOutroItemAvaria[]
+  /// Patrimônio material de setores que referenciam este item do estoque.
+  setorPatrimonioMateriais SetorPatrimonioMaterial[]
+}
+
+/// Uma linha por compra entregue que entrou no estoque (mesmo item em períodos diferentes).
+model EstoqueEntrada {
+  id                      Int      @id @default(autoincrement())
+  estoqueId               Int
+  estoque                 Estoque  @relation(fields: [estoqueId], references: [id], onDelete: Cascade)
+  compraId                Int      @unique
+  compra                  Compra   @relation(fields: [compraId], references: [id], onDelete: Cascade)
+  quantidade              Int
+  valorUnitario           Float
+  cotacoesJson            Json?
+  nfUrl                   String?
+  comprovantePagamentoUrl String?
+  formaPagamento          String?
+  observacao              String?
+  dataEntrada             DateTime @default(now())
+
+  @@index([estoqueId])
+  @@map("EstoqueEntrada")
+}
+
+model EstoqueAlocacao {
+  id           Int      @id @default(autoincrement())
+  estoqueId    Int
+  estoque      Estoque  @relation(fields: [estoqueId], references: [id], onDelete: Cascade)
+  projetoId    Int?
+  projeto      Projeto? @relation(fields: [projetoId], references: [id], onDelete: Cascade)
+  etapaId      Int?
+  etapa        Etapa?   @relation(fields: [etapaId], references: [id], onDelete: Cascade)
+  usuarioId    Int?
+  usuario      Usuario? @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  setorId      Int?
+  setor        Setor?   @relation(fields: [setorId], references: [id], onDelete: Cascade)
+  galpaoProdutoId Int?
+  galpaoProduto  GalpaoProduto? @relation(fields: [galpaoProdutoId], references: [id], onDelete: SetNull)
+  quantidade   Int // Quantidade alocada para este projeto/etapa/usuário/setor
+  dataAlocacao DateTime @default(now())
+
+  @@index([estoqueId])
+  @@index([projetoId])
+  @@index([etapaId])
+  @@index([usuarioId])
+  @@index([setorId])
+  @@index([galpaoProdutoId])
+}
+
+model GalpaoProduto {
+  id              Int                              @id @default(autoincrement())
+  nome            String                           @unique
+  descricao       String?
+  ativo           Boolean                          @default(true)
+  dataCriacao     DateTime                        @default(now())
+  dataAtualizacao DateTime                        @updatedAt
+
+  reservasLivros   GalpaoProdutoLivroReserva[]
+  movimentosLivros GalpaoProdutoLivroMovimento[]
+  estoqueAlocacoes EstoqueAlocacao[]
+  avariasOutrosItens GalpaoOutroItemAvaria[]
+  avariasLivros GalpaoLivroAvaria[]
+}
+
+model GalpaoOutroItemAvaria {
+  id              Int              @id @default(autoincrement())
+  estoqueId       Int
+  estoque         Estoque         @relation(fields: [estoqueId], references: [id], onDelete: Cascade)
+  galpaoProdutoId Int?
+  galpaoProduto   GalpaoProduto? @relation(fields: [galpaoProdutoId], references: [id], onDelete: SetNull)
+
+  quantidade    Int
+  justificativa String
+
+  criadoPorId   Int?
+  criadoPor     Usuario?         @relation(fields: [criadoPorId], references: [id], onDelete: SetNull)
+  dataCriacao   DateTime         @default(now())
+
+  @@index([estoqueId])
+  @@index([galpaoProdutoId])
+}
+
+model GalpaoLivroAvaria {
+  id              Int              @id @default(autoincrement())
+  galpaoProdutoId Int?
+  galpaoProduto   GalpaoProduto?   @relation(fields: [galpaoProdutoId], references: [id], onDelete: SetNull)
+
+  isbn        String
+  categoriaId Int?
+  categoria   CategoriaCompra? @relation(fields: [categoriaId], references: [id], onDelete: SetNull)
+
+  fornecedorId Int?
+  fornecedor   Fornecedor?        @relation(fields: [fornecedorId], references: [id], onDelete: SetNull)
+
+  projetoId Int?
+  projeto   Projeto?            @relation(fields: [projetoId], references: [id], onDelete: SetNull)
+
+  quantidade    Int
+  justificativa String
+
+  criadoPorId Int?
+  criadoPor   Usuario? @relation(fields: [criadoPorId], references: [id], onDelete: SetNull)
+  dataCriacao DateTime @default(now())
+
+  @@index([galpaoProdutoId])
+  @@index([isbn])
+  @@index([categoriaId])
+  @@index([fornecedorId])
+  @@index([projetoId])
+}
+
+model GalpaoProdutoLivroReserva {
+  id              Int               @id @default(autoincrement())
+  galpaoProdutoId Int
+  galpaoProduto   GalpaoProduto    @relation(fields: [galpaoProdutoId], references: [id], onDelete: Cascade)
+
+  isbn        String
+  categoriaId Int?
+  categoria   CategoriaCompra?     @relation(fields: [categoriaId], references: [id], onDelete: SetNull)
+
+  fornecedorId Int?
+  fornecedor   Fornecedor?         @relation(fields: [fornecedorId], references: [id], onDelete: SetNull)
+
+  quantidade     Int
+  dataReserva    DateTime         @default(now())
+  dataAtualizacao DateTime        @updatedAt
+
+  @@unique([galpaoProdutoId, isbn, categoriaId, fornecedorId])
+  @@index([galpaoProdutoId])
+  @@index([categoriaId])
+  @@index([fornecedorId])
+}
+
+model GalpaoProdutoLivroMovimento {
+  id              Int                 @id @default(autoincrement())
+  galpaoProdutoId Int
+  galpaoProduto   GalpaoProduto      @relation(fields: [galpaoProdutoId], references: [id], onDelete: Cascade)
+
+  tipo        GalpaoLivroMovimentoTipo
+  isbn        String
+  categoriaId Int?
+  categoria   CategoriaCompra?       @relation(fields: [categoriaId], references: [id], onDelete: SetNull)
+
+  quantidade  Int
+  dataCriacao DateTime              @default(now())
+
+  @@index([galpaoProdutoId])
+  @@index([categoriaId])
+}
+
+model Ocorrencia {
+  id             Int      @id @default(autoincrement())
+  texto          String
+  anexo          String?
+  status         String   @default("pendente")
+  dataCriacao    DateTime @default(now())
+  usuarioId      Int
+  destinatarioId Int?
+  usuario        Usuario  @relation("OcorrenciasEnviadas", fields: [usuarioId], references: [id])
+  destinatario   Usuario? @relation("OcorrenciasRecebidas", fields: [destinatarioId], references: [id])
+}
+
+model Requerimento {
+  id                         Int              @id @default(autoincrement())
+  texto                      String
+  tipo                       RequerimentoTipo @default(OUTRO)
+  anexo                      String?
+  anexoResposta              String?
+  resposta                   String?
+  status                     String           @default("pendente")
+  dataCriacao                DateTime         @default(now())
+  dataResposta               DateTime?
+  /// Quando o destinatário abre o requerimento pela primeira vez (lista como «Lida»).
+  dataLeituraDestinatario    DateTime?
+  usuarioId                  Int
+  destinatarioId             Int?
+  etapaId        Int?
+  usuario        Usuario          @relation("RequerimentosEnviados", fields: [usuarioId], references: [id])
+  destinatario   Usuario?         @relation("RequerimentosRecebidos", fields: [destinatarioId], references: [id])
+  etapa          Etapa?           @relation(fields: [etapaId], references: [id])
+  notificacoes   Notificacao[] // Notificações relacionadas a este requerimento
+}
+
+model Notificacao {
+  id             Int             @id @default(autoincrement())
+  titulo         String
+  mensagem       String
+  tipo           NotificacaoTipo @default(INFO)
+  lida           Boolean         @default(false)
+  dataCriacao    DateTime        @default(now())
+  usuarioId      Int
+  usuario        Usuario         @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  requerimentoId Int? // Link para o requerimento com detalhes completos
+  requerimento   Requerimento?   @relation(fields: [requerimentoId], references: [id], onDelete: SetNull)
+  etapaId        Int?
+  etapa          Etapa?          @relation(fields: [etapaId], references: [id], onDelete: SetNull)
+  calendarioEventoId Int?
+  calendarioEvento   CalendarioEvento? @relation(fields: [calendarioEventoId], references: [id], onDelete: SetNull)
+
+  @@index([etapaId])
+  @@index([calendarioEventoId])
+}
+
+/// Subscription Web Push (FCM/APNs via protocolo push do browser) por dispositivo.
+model PushSubscription {
+  id        Int      @id @default(autoincrement())
+  usuarioId Int
+  usuario   Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  endpoint  String   @unique @db.Text
+  p256dh    String   @db.Text
+  auth      String   @db.Text
+  userAgent String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([usuarioId])
+}
+
+/// Evento de calendário genérico (ex.: viagem, reunião) com notificação aos participantes.
+model CalendarioEvento {
+  id              Int                  @id @default(autoincrement())
+  titulo          String
+  descricao       String?
+  dataInicio      DateTime
+  dataFim         DateTime
+  alvo            CalendarioEventoAlvo @default(SELECIONADOS)
+  criadorId       Int
+  projetoId       Int?
+  /// Feriado de RH que originou este evento (somente leitura no calendário).
+  feriadoId       Int?
+  criador         Usuario              @relation("CalendarioEventoCriador", fields: [criadorId], references: [id])
+  projeto         Projeto?             @relation(fields: [projetoId], references: [id], onDelete: SetNull)
+  feriado         Feriado?             @relation(fields: [feriadoId], references: [id], onDelete: Cascade)
+  dataCriacao     DateTime             @default(now())
+  dataAtualizacao DateTime             @updatedAt
+  participantes   CalendarioEventoParticipante[]
+  notificacoes    Notificacao[]
+
+  @@index([criadorId])
+  @@index([projetoId])
+  @@index([dataInicio])
+  @@index([feriadoId])
+  @@map("CalendarioEvento")
+}
+
+model CalendarioEventoParticipante {
+  id        Int              @id @default(autoincrement())
+  eventoId  Int
+  usuarioId Int
+  evento    CalendarioEvento @relation(fields: [eventoId], references: [id], onDelete: Cascade)
+  usuario   Usuario          @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  @@unique([eventoId, usuarioId])
+  @@index([usuarioId])
+  @@map("CalendarioEventoParticipante")
+}
+
+model Fornecedor {
+  id                  Int                  @id @default(autoincrement())
+  razaoSocial         String
+  nomeFantasia        String
+  cnpj                String               @unique
+  endereco            String?
+  contato             String?
+  ativo               Boolean              @default(true)
+  dataCriacao         DateTime             @default(now())
+  dataAtualizacao     DateTime             @updatedAt
+  curadoriaOrcamentos CuradoriaOrcamento[]
+  avariasLivros       GalpaoLivroAvaria[]
+  galpaoReservasLivros GalpaoProdutoLivroReserva[]
+
+  @@map("Fornecedor")
+}
+
+model CategoriaCompra {
+  id              Int                 @id @default(autoincrement())
+  nome            String
+  descricao       String?
+  tipo            CategoriaCompraTipo @default(ITEM)
+  ativo           Boolean             @default(true)
+  /// Se falso, compras dessa categoria NÃO entram no estoque ao ficar ENTREGUE.
+  entraNoEstoque  Boolean             @default(true)
+  /// Se falso, itens dessa categoria não podem ser alocados.
+  permiteAlocacao Boolean             @default(true)
+  /// Marca categoria de assinatura recorrente mensal.
+  isAssinatura    Boolean             @default(false)
+  /// Despesa avulsa (passagem, maquiagem, etc.) — não entra no estoque nem é assinatura.
+  isDespesa       Boolean             @default(false)
+  /// Quando verdadeiro, habilita comportamento mensal (alerta e confirmação).
+  recorrenciaMensal Boolean           @default(false)
+  dataCriacao     DateTime            @default(now())
+  dataAtualizacao DateTime            @updatedAt
+  compras         Compra[]
+  curadoriaItens  CuradoriaItem[]
+  estoqueItems    Estoque[]
+  galpaoReservasLivros   GalpaoProdutoLivroReserva[]
+  galpaoMovimentosLivros GalpaoProdutoLivroMovimento[]
+  galpaoAvariasLivros GalpaoLivroAvaria[]
+
+  @@unique([nome, tipo])
+  @@map("CategoriaCompra")
+}
+
+/// Registro de batida de ponto (entrada/saída) feito pelo colaborador
+/// ou ajuste retroativo feito pelo RH com justificativa obrigatória.
+///
+/// Campos de compliance Portaria MTE 671/2021 (REP-P):
+/// - `nsr`: Número Sequencial de Registro, incrementado por seq dedicada.
+/// - `hashAnterior`/`hashAtual`: hash encadeado SHA-256 (cadeia inviolável).
+/// - `comprovanteId`: id do comprovante emitido (para conferência por QR).
+model RegistroPonto {
+  id            Int         @id @default(autoincrement())
+  /// NSR — sequencial e único por instalação; obrigatório para AFD.
+  nsr           Int?        @unique
+  hashAnterior  String?
+  hashAtual     String?
+  comprovanteId String?     @unique
+  usuarioId     Int
+  usuario       Usuario     @relation("RegistroPontoUsuario", fields: [usuarioId], references: [id], onDelete: Cascade)
+  tipo          TipoBatida
+  /// Momento da batida (UTC). É o instante usado para os cálculos do dia.
+  dataHora      DateTime
+  latitude      Float?
+  longitude     Float?
+  /// Precisão (em metros) reportada pelo navegador no momento da batida.
+  precisaoGps   Float?
+  /// Caminho público da foto: /uploads/ponto/<arquivo>.
+  fotoUrl       String?
+  ip            String?
+  origem        OrigemPonto @default(NORMAL)
+  observacao    String?     @db.Text
+
+  ajustadoPorId Int?
+  ajustadoPor   Usuario?    @relation("RegistroPontoAjustador", fields: [ajustadoPorId], references: [id], onDelete: SetNull)
+  /// Justificativa obrigatória para criações/edições/remoções feitas pelo RH.
+  justificativa String?     @db.Text
+  ajustadoEm    DateTime?
+
+  criadoEm      DateTime    @default(now())
+
+  @@index([usuarioId, dataHora])
+  @@index([ajustadoPorId])
+  @@index([nsr])
+  @@map("RegistroPonto")
+}
+
+/// Empregador (CNPJ / CEI / CAEPF) usado como cabeçalho do AFD e dos comprovantes.
+/// O sistema suporta um cadastro único principal (pode ser estendido para multi-empresa depois).
+///
+/// Geocerca opcional: se `latitudeReferencia`/`longitudeReferencia`/`raioMetros`
+/// estiverem definidos, o `bater` valida que a batida está dentro do raio.
+model Empregador {
+  id              Int      @id @default(autoincrement())
+  /// Tipo do identificador: 1=CNPJ, 2=CPF, 3=CAEPF, 4=CNO.
+  tipoIdentificador Int    @default(1)
+  /// CNPJ/CPF/CAEPF/CNO do empregador (somente dígitos).
+  identificador   String   @unique
+  razaoSocial     String
+  cei             String?
+  endereco        String?  @db.Text
+  /// Marca o empregador padrão usado em comprovantes/AFD quando há mais de um.
+  principal       Boolean  @default(true)
+  /// Geocerca: ponto central da unidade.
+  latitudeReferencia  Float?
+  longitudeReferencia Float?
+  /// Raio em metros para validar a batida; null/0 desativa a geocerca.
+  raioMetros          Int?
+  dataCriacao     DateTime @default(now())
+  dataAtualizacao DateTime @updatedAt
+
+  @@map("Empregador")
+}
+
+// ─── Fase 1: Jornada e Solicitações ──────────────────────────────────────────
+
+/// Como o financeiro projeta o custo do ponto no mês (planejamento).
+enum RemuneracaoPontoTipo {
+  NENHUMA
+  VALOR_HORA
+  MENSAL_META_HORAS
+}
+
+/// Jornada padrão de trabalho do colaborador (uma por usuário no MVP).
+/// Tempos em minutos para evitar perda de precisão (ex.: 480 = 8h).
+model JornadaTrabalho {
+  id              Int      @id @default(autoincrement())
+  usuarioId       Int      @unique
+  usuario         Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  cargaDiariaMin  Int      @default(480)
+  cargaSemanalMin Int      @default(2400)
+  inicioPadrao    String   @default("08:00") // HH:mm local
+  fimPadrao       String   @default("17:00")
+  tolerAtrasoMin  Int      @default(10)
+  /// Desconta do tempo trabalhado o intervalo [almocoInicio, almocoFim] quando cruza entrada/saída (batidas automáticas de almoço).
+  almocoAutomatico Boolean @default(true)
+  /// Início do intervalo de almoço no dia local (HH:mm).
+  almocoInicio    String   @default("12:00")
+  /// Fim do intervalo de almoço no dia local (HH:mm).
+  almocoFim       String   @default("13:00")
+  /// Mapa de dias úteis. Default: seg-sex true, sáb/dom false.
+  diasUteis       Json     @default("{\"0\":false,\"1\":true,\"2\":true,\"3\":true,\"4\":true,\"5\":true,\"6\":false}")
+  /// Quando false: por padrão não entra no BH nem é obrigatório bater; a primeira batida do colaborador (sem histórico) ativa true automaticamente. RH pode marcar true manualmente ou dispensar (false) após histórico.
+  controlePonto   Boolean  @default(false)
+  observacao      String?  @db.Text
+  /// Geocerca específica deste colaborador. Quando os 3 campos estão preenchidos,
+  /// SOBRESCREVE a geocerca do `Empregador` principal para a batida deste usuário
+  /// (útil para colaboradores externos, home-office com endereço fixo, filiais etc.).
+  /// Quando os 3 estão `null`, cai no comportamento global (Empregador.principal).
+  latitudeReferencia  Float?
+  longitudeReferencia Float?
+  raioMetros          Int?
+  /// Sem horário fixo de entrada: o esperado por dia útil vem da carga semanal dividida pelos dias úteis marcados; atraso por `inicioPadrao` não se aplica.
+  horarioFlexivel Boolean @default(false)
+  /// Planejamento financeiro (aba Financeiro); não altera folha legal automaticamente.
+  remuneracaoPontoTipo RemuneracaoPontoTipo @default(NENHUMA)
+  valorHora             Decimal? @db.Decimal(12, 4)
+  valorMensal           Decimal? @db.Decimal(14, 2)
+  /// Meta de horas no mês (minutos), para `MENSAL_META_HORAS`. Preenchida automaticamente a partir da carga semanal (× 52/12); não editável manualmente na API.
+  metaHorasMensalMin    Int?
+  dataCriacao     DateTime @default(now())
+  dataAtualizacao DateTime @updatedAt
+
+  @@map("JornadaTrabalho")
+}
+
+/// Solicitação de ajuste de ponto feita pelo colaborador (esqueci de bater etc.).
+/// Quando aprovada, gera um RegistroPonto com origem=AJUSTE_RH automaticamente.
+model SolicitacaoAjustePonto {
+  id                Int               @id @default(autoincrement())
+  usuarioId         Int
+  usuario           Usuario           @relation("SolicitacaoAjusteAutor", fields: [usuarioId], references: [id], onDelete: Cascade)
+  tipo              TipoBatida
+  dataHora          DateTime
+  motivo            String            @db.Text
+  anexoUrl          String?
+  status            SolicitacaoStatus @default(PENDENTE)
+  revisorId         Int?
+  revisor           Usuario?          @relation("SolicitacaoAjusteRevisor", fields: [revisorId], references: [id], onDelete: SetNull)
+  comentarioRevisor String?           @db.Text
+  dataDecisao       DateTime?
+  registroPontoId   Int?
+  dataCriacao       DateTime          @default(now())
+
+  @@index([usuarioId, status])
+  @@index([revisorId])
+  @@map("SolicitacaoAjustePonto")
+}
+
+// ─── Fase 2: Banco de Horas ─────────────────────────────────────────────────
+
+/// Lançamento individual no banco de horas (pode ser crédito ou débito).
+model BancoHorasLancamento {
+  id              Int               @id @default(autoincrement())
+  usuarioId       Int
+  usuario         Usuario           @relation("BancoHorasUsuario", fields: [usuarioId], references: [id], onDelete: Cascade)
+  /// Competência no formato YYYY-MM (ex.: "2026-04").
+  competencia     String
+  data            DateTime
+  minutosCredito  Int               @default(0)
+  minutosDebito   Int               @default(0)
+  origem          BancoHorasOrigem  @default(PONTO)
+  descricao       String?
+  criadoEm        DateTime          @default(now())
+  solicitacaoUsoExtras BancoHorasUsoExtrasSolicitacao?
+
+  @@index([usuarioId, competencia])
+  @@map("BancoHorasLancamento")
+}
+
+/// Fechamento mensal do banco de horas (snapshot do saldo da competência).
+///
+/// Campos de auditoria/recibo:
+/// - `nsrInicial`/`nsrFinal`: faixa de NSR de RegistroPonto cobertos no mês.
+/// - `reciboHash`: hash SHA-256 do espelho gerado, garantindo integridade.
+/// - `aceiteEm`/`aceiteIp`: confirmação do colaborador ao baixar o recibo.
+model BancoHorasFechamento {
+  id                Int      @id @default(autoincrement())
+  usuarioId         Int
+  usuario           Usuario  @relation("BancoHorasUsuarioFech", fields: [usuarioId], references: [id], onDelete: Cascade)
+  competencia       String
+  saldoAnteriorMin  Int      @default(0)
+  creditoMin        Int      @default(0)
+  debitoMin         Int      @default(0)
+  saldoFinalMin     Int      @default(0)
+  fechadoPorId      Int?
+  fechadoPor        Usuario? @relation("BancoHorasFechamentoPor", fields: [fechadoPorId], references: [id], onDelete: SetNull)
+  fechadoEm         DateTime @default(now())
+  nsrInicial        Int?
+  nsrFinal          Int?
+  reciboHash        String?
+  reciboPdfUrl      String?
+  /// Quando o colaborador acessa o recibo do mês a partir do app/sistema.
+  aceiteEm          DateTime?
+  aceiteIp          String?
+
+  logs              BancoHorasFechamentoLog[]
+
+  @@unique([usuarioId, competencia])
+  @@map("BancoHorasFechamento")
+}
+
+/// Eventos do ciclo de vida de um fechamento (FECHADO, REABERTO, RECONFIRMADO).
+/// Trilha de auditoria persistente; substitui logs apenas em memória.
+model BancoHorasFechamentoLog {
+  id            Int      @id @default(autoincrement())
+  fechamentoId  Int
+  fechamento    BancoHorasFechamento @relation(fields: [fechamentoId], references: [id], onDelete: Cascade)
+  evento        String
+  executorId    Int?
+  executor      Usuario? @relation("BancoHorasFechamentoLogExec", fields: [executorId], references: [id], onDelete: SetNull)
+  motivo        String?  @db.Text
+  /// Snapshot JSON do estado anterior (para perícia).
+  snapshot      Json?
+  ip            String?
+  dataCriacao   DateTime @default(now())
+
+  @@index([fechamentoId, dataCriacao])
+  @@map("BancoHorasFechamentoLog")
+}
+
+/// Desafio "palavra-chave" persistente para reabertura de competência.
+/// Substitui o `Map` em memória do service para sobreviver a restart e multi-instância.
+model BancoHorasReaberturaDesafio {
+  id            Int      @id @default(autoincrement())
+  adminId       Int
+  admin         Usuario  @relation("BHReabDesafioAdmin", fields: [adminId], references: [id], onDelete: Cascade)
+  usuarioAlvoId Int
+  usuarioAlvo   Usuario  @relation("BHReabDesafioAlvo", fields: [usuarioAlvoId], references: [id], onDelete: Cascade)
+  competencia   String
+  hashPalavra   String
+  expiraEm      DateTime
+  usadoEm       DateTime?
+  motivo        String?  @db.Text
+  dataCriacao   DateTime @default(now())
+
+  @@index([adminId, usuarioAlvoId, competencia, usadoEm])
+  @@map("BancoHorasReaberturaDesafio")
+}
+
+/// Solicitação do colaborador para usar (débitar) horas extras do banco, dentro do limite definido pelo RH.
+model BancoHorasUsoExtrasSolicitacao {
+  id                 Int               @id @default(autoincrement())
+  usuarioId          Int
+  usuario            Usuario           @relation("BancoHorasUsoExtrasUsuario", fields: [usuarioId], references: [id], onDelete: Cascade)
+  minutosSolicitados Int
+  /// Competência em que o débito será lançado ao aprovar (YYYY-MM).
+  competencia        String
+  observacao         String?           @db.Text
+  status             SolicitacaoStatus @default(PENDENTE)
+  revisorId          Int?
+  revisor            Usuario?          @relation("BancoHorasUsoExtrasRevisor", fields: [revisorId], references: [id], onDelete: SetNull)
+  comentarioRevisor  String?           @db.Text
+  dataDecisao        DateTime?
+  dataCriacao        DateTime          @default(now())
+  lancamentoId       Int?              @unique
+  lancamento         BancoHorasLancamento? @relation(fields: [lancamentoId], references: [id], onDelete: SetNull)
+
+  @@index([usuarioId, status])
+  @@index([status, dataCriacao])
+  @@map("BancoHorasUsoExtrasSolicitacao")
+}
+
+// ─── Fase 2: Férias e Afastamentos ──────────────────────────────────────────
+
+/// Período aquisitivo de férias (12 meses) que dá direito a 30 dias.
+model PeriodoAquisitivo {
+  id              Int                 @id @default(autoincrement())
+  usuarioId       Int
+  usuario         Usuario             @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  inicio          DateTime
+  fim             DateTime
+  diasDireito     Int                 @default(30)
+  diasUsados      Int                 @default(0)
+  observacao      String?
+  dataCriacao     DateTime            @default(now())
+  feriasSolicitadas FeriasSolicitacao[]
+
+  @@unique([usuarioId, inicio])
+  @@index([usuarioId])
+  @@map("PeriodoAquisitivo")
+}
+
+/// Solicitação de férias do colaborador, com aprovação do RH/gestor.
+///
+/// Campos CLT:
+/// - `tercoConstitucional`: valor do 1/3 constitucional (informativo / folha).
+/// - `abonoPecuniario`: dias vendidos (até 10).
+/// - `dataPagamento`: data prevista de pagamento (deve preceder o início).
+///
+/// Reservas:
+/// - Enquanto status PENDENTE, os dias já são considerados como reserva
+///   (computados no saldo disponível, mas reversíveis ao cancelar).
+model FeriasSolicitacao {
+  id                  Int                @id @default(autoincrement())
+  usuarioId           Int
+  usuario             Usuario            @relation("FeriasSolicitacaoUsuario", fields: [usuarioId], references: [id], onDelete: Cascade)
+  periodoAquisitivoId Int?
+  periodoAquisitivo   PeriodoAquisitivo? @relation(fields: [periodoAquisitivoId], references: [id], onDelete: SetNull)
+  dataInicio          DateTime
+  dataFim             DateTime
+  diasSolicitados     Int
+  abonoPecuniario     Int                @default(0)
+  tercoConstitucional Decimal?           @db.Decimal(12, 2)
+  dataPagamento       DateTime?
+  observacao          String?            @db.Text
+  status              SolicitacaoStatus  @default(PENDENTE)
+  revisorId           Int?
+  revisor             Usuario?           @relation("FeriasSolicitacaoRevisor", fields: [revisorId], references: [id], onDelete: SetNull)
+  comentarioRevisor   String?            @db.Text
+  dataDecisao         DateTime?
+  dataCriacao         DateTime           @default(now())
+
+  @@index([usuarioId, status])
+  @@map("FeriasSolicitacao")
+}
+
+/// Afastamento (atestado, licença, falta abonada). Suporta upload de anexo.
+model Afastamento {
+  id                Int             @id @default(autoincrement())
+  usuarioId         Int
+  usuario           Usuario         @relation("AfastamentoUsuario", fields: [usuarioId], references: [id], onDelete: Cascade)
+  tipo              AfastamentoTipo
+  dataInicio        DateTime
+  dataFim           DateTime
+  motivo            String?         @db.Text
+  anexoUrl          String?
+  registradoPorId   Int?
+  registradoPor     Usuario?        @relation("AfastamentoRegistradoPor", fields: [registradoPorId], references: [id], onDelete: SetNull)
+  dataCriacao       DateTime        @default(now())
+
+  @@index([usuarioId, dataInicio])
+  @@map("Afastamento")
+}
+
+/// Feriado nacional/empresa — dias sem exigência de ponto para todos os colaboradores.
+model Feriado {
+  id               Int                @id @default(autoincrement())
+  dataInicio       DateTime           @db.Date
+  dataFim          DateTime           @db.Date
+  nome             String
+  descricao        String?            @db.Text
+  /// Repete todo ano na mesma data (mês/dia de `dataInicio`/`dataFim`).
+  recorrenteAnual  Boolean            @default(false)
+  criadoPorId      Int?
+  criadoPor        Usuario?           @relation("FeriadoCriador", fields: [criadoPorId], references: [id], onDelete: SetNull)
+  dataCriacao      DateTime           @default(now())
+  calendarioEventos CalendarioEvento[]
+
+  @@index([dataInicio])
+  @@map("Feriado")
+}
+
+// ─── Fase 2: Documentos do Colaborador ───────────────────────────────────────
+
+/// Documento associado a um colaborador (contrato, ASO, certificado, etc.).
+model DocumentoColaborador {
+  id              Int                       @id @default(autoincrement())
+  usuarioId       Int
+  usuario         Usuario                   @relation("DocumentoColaboradorUsuario", fields: [usuarioId], references: [id], onDelete: Cascade)
+  tipo            DocumentoColaboradorTipo
+  titulo          String
+  arquivoUrl      String
+  dataValidade    DateTime?
+  observacao      String?                   @db.Text
+  uploadPorId     Int?
+  uploadPor       Usuario?                  @relation("DocumentoColaboradorUploadPor", fields: [uploadPorId], references: [id], onDelete: SetNull)
+  dataCriacao     DateTime                  @default(now())
+
+  @@index([usuarioId, tipo])
+  @@map("DocumentoColaborador")
+}
+
+// ─── Fase 3: Avaliação de Desempenho ────────────────────────────────────────
+
+/// Ciclo periódico de avaliação (ex.: 2026-Q2).
+model CicloAvaliacao {
+  id          Int                  @id @default(autoincrement())
+  nome        String
+  descricao   String?              @db.Text
+  dataInicio  DateTime
+  dataFim     DateTime
+  status      CicloAvaliacaoStatus @default(PLANEJAMENTO)
+  /// Roteiro de perguntas (Json com itens { id, label, tipo, opcoes? }).
+  roteiroJson Json?
+  criadorId   Int
+  criador     Usuario              @relation("CicloAvaliacaoCriador", fields: [criadorId], references: [id])
+  dataCriacao DateTime             @default(now())
+  avaliacoes  AvaliacaoDesempenho[]
+
+  @@map("CicloAvaliacao")
+}
+
+/// Avaliação individual dentro de um ciclo (avaliador X avaliado).
+model AvaliacaoDesempenho {
+  id            Int               @id @default(autoincrement())
+  cicloId       Int
+  ciclo         CicloAvaliacao    @relation(fields: [cicloId], references: [id], onDelete: Cascade)
+  avaliadoId    Int
+  avaliado      Usuario           @relation("AvaliacaoDesempenhoAvaliado", fields: [avaliadoId], references: [id], onDelete: Cascade)
+  avaliadorId   Int
+  avaliador     Usuario           @relation("AvaliacaoDesempenhoAvaliador", fields: [avaliadorId], references: [id], onDelete: Cascade)
+  status        AvaliacaoStatus   @default(PENDENTE)
+  /// Respostas no formato { perguntaId: valor }.
+  respostasJson Json?
+  notaFinal     Float?
+  comentario    String?           @db.Text
+  dataResposta  DateTime?
+  dataCriacao   DateTime          @default(now())
+
+  @@unique([cicloId, avaliadoId, avaliadorId])
+  @@index([avaliadoId])
+  @@index([avaliadorId])
+  @@map("AvaliacaoDesempenho")
+}
+
+/// Meta individual associada ao colaborador (PDI - Plano de Desenvolvimento).
+model MetaIndividual {
+  id          Int      @id @default(autoincrement())
+  usuarioId   Int
+  usuario     Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  titulo      String
+  descricao   String?  @db.Text
+  peso        Int      @default(1)
+  /// Status livre: PENDENTE, EM_ANDAMENTO, CONCLUIDA, CANCELADA.
+  status      String   @default("PENDENTE")
+  prazo       DateTime?
+  dataCriacao DateTime @default(now())
+  dataAtualizacao DateTime @updatedAt
+
+  @@index([usuarioId, status])
+  @@map("MetaIndividual")
+}
+
+// ─── Fase 3: Treinamentos ───────────────────────────────────────────────────
+
+model Treinamento {
+  id            Int                    @id @default(autoincrement())
+  titulo        String
+  descricao     String?                @db.Text
+  cargaHoraria  Int                    @default(0)
+  /// Legado: vídeo único (preferir itens tipo VIDEO na trilha).
+  videoUrl            String?
+  videoNome           String?
+  videoTamanhoBytes   Int?
+  videoMimeType       String?
+  /// Anexos como array de { url, nome }.
+  anexosJson    Json?
+  criadorId     Int?
+  criador       Usuario?               @relation("TreinamentoCriador", fields: [criadorId], references: [id], onDelete: SetNull)
+  ativo         Boolean                @default(true)
+  dataCriacao   DateTime               @default(now())
+  matriculas    TreinamentoMatricula[]
+  cargosObrigatorios CargoTreinamento[]
+  itens         TreinamentoItem[]
+
+  @@map("Treinamento")
+}
+
+/// Etapa ordenada da trilha: vídeo ou questão (1 enunciado + 4 alternativas em questaoJson).
+model TreinamentoItem {
+  id              Int                 @id @default(autoincrement())
+  treinamentoId   Int
+  treinamento     Treinamento         @relation(fields: [treinamentoId], references: [id], onDelete: Cascade)
+  ordem           Int
+  tipo            TreinamentoItemTipo
+  titulo          String?
+  videoUrl        String?
+  videoNome       String?
+  videoTamanhoBytes Int?
+  videoMimeType   String?
+  /// { enunciado: string, alternativas: [{ texto, correta }] } — hoje 4 alternativas, 1 correta.
+  questaoJson     Json?
+  dataCriacao     DateTime            @default(now())
+  progressos      TreinamentoItemProgresso[]
+
+  @@unique([treinamentoId, ordem])
+  @@index([treinamentoId])
+  @@map("TreinamentoItem")
+}
+
+model TreinamentoMatricula {
+  id              Int                       @id @default(autoincrement())
+  treinamentoId   Int
+  treinamento     Treinamento               @relation(fields: [treinamentoId], references: [id], onDelete: Cascade)
+  usuarioId       Int
+  usuario         Usuario                   @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  status          MatriculaTreinamentoStatus @default(PENDENTE)
+  dataConclusao   DateTime?
+  certificadoUrl  String?
+  notaAvaliacao   Float?
+  dataCriacao     DateTime                  @default(now())
+  progressosItens TreinamentoItemProgresso[]
+
+  @@unique([treinamentoId, usuarioId])
+  @@index([usuarioId, status])
+  @@map("TreinamentoMatricula")
+}
+
+model TreinamentoItemProgresso {
+  id              Int                  @id @default(autoincrement())
+  matriculaId     Int
+  matricula       TreinamentoMatricula @relation(fields: [matriculaId], references: [id], onDelete: Cascade)
+  itemId          Int
+  item            TreinamentoItem      @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  concluido       Boolean              @default(false)
+  respostaIndice  Int?
+  respostaCorreta Boolean?
+  dataConclusao   DateTime?
+
+  @@unique([matriculaId, itemId])
+  @@index([matriculaId])
+  @@map("TreinamentoItemProgresso")
+}
+
+/// Tabela m-n: cargos que exigem o treinamento como obrigatório.
+model CargoTreinamento {
+  cargoId        Int
+  cargo          Cargo       @relation(fields: [cargoId], references: [id], onDelete: Cascade)
+  treinamentoId  Int
+  treinamento    Treinamento @relation(fields: [treinamentoId], references: [id], onDelete: Cascade)
+
+  @@id([cargoId, treinamentoId])
+  @@map("CargoTreinamento")
+}
+
+// Documentos institucionais gerados pelo módulo Documentos (certificados, termos)
+model DocumentoGlobaltec {
+  id           Int                  @id @default(autoincrement())
+  tipo         String               // certificado | fornecedor | estagiario
+  nomeExibicao String
+  nomeArquivo  String
+  url          String
+  criadoPorId  Int
+  criadoPor    Usuario              @relation("DocumentoCriador", fields: [criadoPorId], references: [id], onDelete: Restrict)
+  /// Colaborador/estagiário/pesquisador vinculado ao documento assinado
+  usuarioId    Int?
+  usuario      Usuario?             @relation("DocumentoSignatario", fields: [usuarioId], references: [id], onDelete: SetNull)
+  criadoEm     DateTime             @default(now())
+  convite      DocumentoConvite?
+  repositorio  DocumentoPatenteAplicacao?
+
+  @@index([usuarioId, tipo])
+  @@map("DocumentoGlobaltec")
+}
+
+// Repositório de patentes, certificados gerados e documentos de aplicação
+model PatenteDocumentoPasta {
+  id          Int                         @id @default(autoincrement())
+  nome        String
+  descricao   String?
+  /// Pasta do sistema (ex.: documentos gerados automaticamente) — não pode ser excluída
+  sistema     Boolean                     @default(false)
+  criadoPorId Int
+  criadoPor   Usuario                     @relation("PatentePastaCriador", fields: [criadoPorId], references: [id], onDelete: Restrict)
+  criadoEm    DateTime                    @default(now())
+  documentos  DocumentoPatenteAplicacao[]
+
+  @@index([nome])
+  @@map("PatenteDocumentoPasta")
+}
+
+model DocumentoPatenteAplicacao {
+  id                   Int                 @id @default(autoincrement())
+  /// patente | aplicacao | certificado | termo | outro
+  categoria            String
+  nomeExibicao         String
+  descricao            String?
+  /// Nº de registro, protocolo INPI, hash, etc.
+  numeroReferencia     String?
+  nomeArquivo          String
+  url                  String
+  /// gerado (módulo Documentos) | upload (envio manual)
+  origem               String              @default("upload")
+  pastaId              Int?
+  pasta                PatenteDocumentoPasta? @relation(fields: [pastaId], references: [id], onDelete: Cascade)
+  documentoGlobaltecId Int?                @unique
+  documentoGlobaltec   DocumentoGlobaltec? @relation(fields: [documentoGlobaltecId], references: [id], onDelete: Cascade)
+  criadoPorId          Int
+  criadoPor            Usuario             @relation("PatenteDocumentoCriador", fields: [criadoPorId], references: [id], onDelete: Restrict)
+  criadoEm             DateTime            @default(now())
+
+  @@index([categoria])
+  @@index([origem])
+  @@index([pastaId])
+  @@map("DocumentoPatenteAplicacao")
+}
+
+// Link de convite público para preenchimento e assinatura sem login
+model DocumentoConvite {
+  id          Int                 @id @default(autoincrement())
+  token       String              @unique
+  tipo        String              // fornecedor | estagiario
+  titulo      String?
+  criadoPorId Int
+  criadoPor   Usuario             @relation("DocumentoConviteCriador", fields: [criadoPorId], references: [id], onDelete: Restrict)
+  /// Colaborador que deve preencher e assinar
+  usuarioId   Int?
+  usuario     Usuario?            @relation("DocumentoConviteSignatario", fields: [usuarioId], references: [id], onDelete: SetNull)
+  criadoEm    DateTime            @default(now())
+  expiresAt   DateTime?
+  usadoEm     DateTime?
+  documentoId Int?                @unique
+  documento   DocumentoGlobaltec? @relation(fields: [documentoId], references: [id], onDelete: SetNull)
+
+  @@index([usuarioId, tipo])
+  @@map("DocumentoConvite")
+}

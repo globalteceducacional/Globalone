@@ -1,0 +1,177 @@
+#participantsform {
+    .btn-group {
+        width: 100%;
+        text-align: center;
+        display: block;
+    }
+
+    #formactionid {
+        width: 40%;
+        display: inline;
+    }
+
+    .btn {
+        margin: 0.5rem;
+    }
+}
+
+#page {
+    .activity-navigation {
+        clear: both;
+
+        #prev-activity-link,
+        #next-activity-link {
+            white-space: pre-wrap;
+            line-height: 1.75;
+            max-width: 300px;
+            height: auto;
+        }
+
+        @media (max-width: 768px) {
+            #prev-activity-link,
+            #next-activity-link {
+                max-width: none;
+            }
+        }
+
+        .row {
+            margin: 0;
+        }
+
+        #jump-to-activity {
+            background-color: $white;
+        }
+    }
+
+    .section-navigation {
+        .custom-select.jumpmenu,
+        .form-select.jumpmenu {
+            width: auto;
+            margin: 0 auto;
+        }
+
+        .mdl-right,
+        .mdl-left {
+            white-space: pre-wrap;
+            line-height: 1.75;
+            max-width: 300px;
+            height: auto;
+            text-align: center;
+
+            a {
+                text-transform: $text-transform;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .mdl-right,
+            .mdl-left {
+                width: 100%;
+                max-width: none;
+            }
+        }
+    }
+
+    #completionprogressid .btn {
+        height: auto;
+    }
+}
+
+body#page-my-index.page-mycourses {
+    #topofscroll {
+        margin-top: 0;
+        background: transparent;
+        #region-main {
+            background: $body-bg-color;
+        }
+    }
+}
+
+body#page-course-view-topics {
+    #topofscroll {
+        [data-toggle='collapse'].btn-icon,
+        [data-bs-toggle='collapse'].btn-icon {
+            background-color: $white;
+            color: fix-color-contrast($primary);
+            height: auto;
+            line-height: 1;
+            padding: 0;
+            margin: 0;
+        }
+        .secondary-navigation .navigation {
+            margin: 0;
+        }
+    }
+}
+
+body.format-topics:not(#page-course-view-topics),
+body.pagelayout-incourse,
+body.format-topics.path-user {
+    #page-content {
+        @extend %border-frequency;
+        &:before {
+            height: 1rem;
+            top: -1rem;
+        }
+        &:after {
+            height: 0.15rem;
+        }
+        #region-main {
+            padding: 2rem;
+        }
+    }
+}
+
+body#page-course-view-topics.pagelayout-incourse {
+    #topofscroll #region-main-box {
+        #region-main,
+        [role='main'] {
+            background-color: $white;
+        }
+    }
+}
+
+body.format-topics.path-user,
+body.path-grade {
+    #region-main-box {
+        padding: 0;
+    }
+}
+
+#page-course-view-participants {
+    .secondary-navigation {
+        max-width: $course-content-maxwidth;
+        margin: 0 auto;
+        .navigation {
+            margin: 0;
+        }
+    }
+}
+
+body.pagelayout-course {
+    #region-main {
+        background-color: transparent;
+    }
+    .course-content li.section {
+        background-color: rgb(255, 255, 255);
+        margin-bottom: 1rem;
+        padding: 0.5rem;
+    }
+}
+
+body:not(#page-course-view-weeks, #page-course-view-topics, #page-course-view-remuiformat) .course-content {
+    background-color: rgb(255, 255, 255);
+    margin-bottom: 1rem;
+    padding: 0.5rem;
+    border-bottom: 1px solid rgba(144, 144, 144, 0.35);
+}
+
+body.pagelayout-course .section {
+    padding: 0.5rem !important;
+}
+
+// For Gradebook report.
+.initials-selector .initialswidget,
+.pagination-sm .page-link {
+    padding: 0.25rem 0.5rem !important;
+}

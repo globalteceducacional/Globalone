@@ -1,0 +1,42 @@
+Pasta pronta para subir na VPS (Docker + Nginx do sistema)
+
+Conteudo principal:
+  moodle/                   codigo do Moodle
+  moodledata/               arquivos do Moodle (NAO vai pro Git)
+  backup-moodle.sql         dump do banco (NAO vai pro Git)
+  Dockerfile                imagem PHP + Apache
+  docker-compose.yml        moodle + mariadb
+  .env.example              modelo de variaveis (vai pro Git)
+  .env                      senhas reais (NAO vai pro Git — criar na VPS)
+  nginx-ava.conf.example    modelo Nginx para a VPS
+
+SEGURANCA (.env):
+  1. No PC: cp .env.example .env  (ja feito se .env existir)
+  2. Edite .env com senhas fortes
+  3. MOODLE_DB_PASSWORD deve ser IGUAL a MYSQL_PASSWORD
+  4. Na VPS: copie .env manualmente (FileZilla) ou crie la a partir do .env.example
+  5. NUNCA faca git add .env
+
+ANTES DE SUBIR (PC):
+  1. Apague moodledata/moodledata/ se existir (copia duplicada)
+  2. Envie via FileZilla: moodledata/, backup-moodle.sql, .env
+  3. Git clone traz codigo + docker-compose; .env e moodledata vao separado
+
+NA VPS — Docker:
+  1. Gerenciador Docker -> Compose -> projeto moodle-ava
+  2. Caminho: ex. /otp/moodle-docker
+  3. Confirme que .env existe na mesma pasta do docker-compose.yml
+  4. Implantar / Deploy
+  5. Teste: curl -I http://127.0.0.1:8081
+
+NA VPS — Nginx:
+  1. cp nginx-ava.conf.example /etc/nginx/sites-available/ava.alenxandriaglobaltec.com
+  2. ln -s /etc/nginx/sites-available/ava.alenxandriaglobaltec.com /etc/nginx/sites-enabled/
+  3. nginx -t ; systemctl reload nginx
+  4. certbot --nginx -d ava.alenxandriaglobaltec.com
+
+DEPOIS DE ABRIR:
+  - Trocar URL: http://moodle.test -> https://ava.alenxandriaglobaltec.com
+  - Limpar cache
+  - Cron: docker exec moodle-app php /var/www/html/admin/cli/cron.php --keep-alive=0
+

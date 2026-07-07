@@ -1,0 +1,230 @@
+name: gone-suite
+
+services:
+  gateway:
+    image: caddy:2.8-alpine
+    container_name: gone-gateway
+    restart: unless-stopped
+    depends_on:
+      - gone
+      - erp-frontend
+      - erp-backend
+      - ava-moodle
+      - teca-web
+      - teca-api
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      GONE_DOMAIN: ${GONE_DOMAIN}
+      ERP_DOMAIN: ${ERP_DOMAIN}
+      AVA_DOMAIN: ${AVA_DOMAIN}
+      TECA_DOMAIN: ${TECA_DOMAIN}
+      LETSENCRYPT_EMAIL: ${LETSENCRYPT_EMAIL}
+    volumes:
+      - ./gateway/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    networks:
+      - suite-net
+
+  gone:
+    image: nginx:1.27-alpine
+    container_name: gone-portal
+    restart: unless-stopped
+    volumes:
+      - ./apps/gone:/usr/share/nginx/html:ro
+      - ./apps/gone_nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    networks:
+      - suite-net
+
+  erp-db:
+    image: postgres:15-alpine
+    container_name: gone-erp-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${ERP_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${ERP_POSTGRES_PASSWORD}
+      POSTGRES_DB: ${ERP_POSTGRES_DB}
+    volumes:
+      - erp_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${ERP_POSTGRES_USER} -d ${ERP_POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks:
+      - suite-net
+
+  erp-backend:
+    build:
+      context: ./apps/erp/backend
+      dockerfile: Dockerfile
+    container_name: gone-erp-backend
+    restart: unless-stopped
+    depends_on:
+      erp-db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://${ERP_POSTGRES_USER}:${ERP_POSTGRES_PASSWORD}@erp-db:5432/${ERP_POSTGRES_DB}
+      JWT_SECRET: ${ERP_JWT_SECRET}
+      JWT_EXPIRES_IN: ${ERP_JWT_EXPIRES_IN:-7d}
+      CORS_ORIGINS: https://${ERP_DOMAIN},https://${GONE_DOMAIN}
+      TZ: ${TZ:-America/Sao_Paulo}
+      PORT: 3001
+      NODE_ENV: production
+      UPLOADS_DIR: /app/uploads
+      UPLOADS_URL_PREFIX: /uploads
+      UPLOAD_MAX_MB: ${UPLOAD_MAX_MB:-2048}
+      VAPID_PUBLIC_KEY: ${VAPID_PUBLIC_KEY:-}
+      VAPID_PRIVATE_KEY: ${VAPID_PRIVATE_KEY:-}
+      VAPID_SUBJECT: ${VAPID_SUBJECT:-mailto:no-reply@example.com}
+    volumes:
+      - erp_uploads:/app/uploads
+    command: >
+      sh -c "
+        set -e &&
+        echo 'Aguardando banco ERP...' &&
+        sleep 8 &&
+        echo 'Executando migrations ERP...' &&
+        prisma migrate deploy &&
+        echo 'Iniciando backend ERP...' &&
+        exec node dist/src/main.js
+      "
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 90s
+    networks:
+      - suite-net
+
+  erp-frontend:
+    build:
+      context: ./apps/erp/frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_API_URL: /api
+    container_name: gone-erp-frontend
+    restart: unless-stopped
+    depends_on:
+      - erp-backend
+    networks:
+      - suite-net
+
+  ava-db:
+    image: mariadb:10.11
+    container_name: gone-ava-db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${AVA_MYSQL_DATABASE}
+      MYSQL_USER: ${AVA_MYSQL_USER}
+      MYSQL_PASSWORD: ${AVA_MYSQL_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${AVA_MYSQL_ROOT_PASSWORD}
+    volumes:
+      - ava_db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks:
+      - suite-net
+
+  ava-moodle:
+    build:
+      context: ./apps/ava
+      dockerfile: Dockerfile
+    container_name: gone-ava-moodle
+    restart: unless-stopped
+    depends_on:
+      ava-db:
+        condition: service_healthy
+    environment:
+      MOODLE_DB_HOST: ava-db
+      MOODLE_DB_NAME: ${AVA_MYSQL_DATABASE}
+      MOODLE_DB_USER: ${AVA_MYSQL_USER}
+      MOODLE_DB_PASSWORD: ${AVA_MYSQL_PASSWORD}
+      MOODLE_WWWROOT: https://${AVA_DOMAIN}
+      MOODLE_DATAROOT: /var/moodledata
+    volumes:
+      - ava_moodledata:/var/moodledata
+    networks:
+      - suite-net
+
+  teca-db:
+    image: postgres:15-alpine
+    container_name: gone-teca-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${TECA_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${TECA_POSTGRES_PASSWORD}
+      POSTGRES_DB: ${TECA_POSTGRES_DB}
+    volumes:
+      - teca_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${TECA_POSTGRES_USER} -d ${TECA_POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks:
+      - suite-net
+
+  teca-api:
+    build:
+      context: ./apps/teca-api
+      dockerfile: Dockerfile
+    container_name: gone-teca-api
+    restart: unless-stopped
+    depends_on:
+      teca-db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://${TECA_POSTGRES_USER}:${TECA_POSTGRES_PASSWORD}@teca-db:5432/${TECA_POSTGRES_DB}
+      TECA_JWT_SECRET: ${TECA_JWT_SECRET}
+      TECA_JWT_EXPIRES_IN: ${TECA_JWT_EXPIRES_IN:-7d}
+      TECA_ADMIN_EMAIL: ${TECA_ADMIN_EMAIL}
+      TECA_ADMIN_PASSWORD: ${TECA_ADMIN_PASSWORD}
+      TECA_ADMIN_NAME: ${TECA_ADMIN_NAME}
+      TECA_TCP_ENABLED: ${TECA_TCP_ENABLED:-false}
+      TECA_IA_HOST: ${TECA_IA_HOST:-}
+      TECA_IA_PORT: ${TECA_IA_PORT:-6000}
+      TECA_TCP_TIMEOUT_MS: ${TECA_TCP_TIMEOUT_MS:-120000}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      GEMINI_MODEL: ${GEMINI_MODEL:-gemini-2.0-flash}
+      CORS_ORIGINS: https://${TECA_DOMAIN},https://${GONE_DOMAIN},https://${ERP_DOMAIN},https://${AVA_DOMAIN}
+      PORT: 3002
+      TZ: ${TZ:-America/Sao_Paulo}
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3002/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
+    networks:
+      - suite-net
+
+  teca-web:
+    build:
+      context: ./apps/teca-web
+      dockerfile: Dockerfile
+    container_name: gone-teca-web
+    restart: unless-stopped
+    depends_on:
+      - teca-api
+    networks:
+      - suite-net
+
+networks:
+  suite-net:
+    driver: bridge
+
+volumes:
+  caddy_data:
+  caddy_config:
+  erp_db_data:
+  erp_uploads:
+  ava_db_data:
+  ava_moodledata:
+  teca_db_data:

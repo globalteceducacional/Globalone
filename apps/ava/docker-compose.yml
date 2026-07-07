@@ -1,0 +1,53 @@
+services:
+  moodle:
+    build: .
+    container_name: moodle-app
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      MOODLE_DB_HOST: ${MOODLE_DB_HOST:-db}
+      MOODLE_DB_NAME: ${MOODLE_DB_NAME:-moodle}
+      MOODLE_DB_USER: ${MOODLE_DB_USER:-moodle}
+      MOODLE_DB_PASSWORD: ${MOODLE_DB_PASSWORD}
+      MOODLE_WWWROOT: ${MOODLE_WWWROOT}
+      MOODLE_DATAROOT: ${MOODLE_DATAROOT:-/var/moodledata}
+    volumes:
+      - ./moodle:/var/www/html
+      - ./moodledata:/var/moodledata
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:${MOODLE_HTTP_PORT:-8081}:80"
+    networks:
+      - moodle-net
+
+  db:
+    image: mariadb:10.11
+    container_name: moodle-db
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-moodle}
+      MYSQL_USER: ${MYSQL_USER:-moodle}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    volumes:
+      - moodle_db:/var/lib/mysql
+      - ./backup-moodle.sql:/docker-entrypoint-initdb.d/01-backup.sql:ro
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks:
+      - moodle-net
+
+volumes:
+  moodle_db:
+
+networks:
+  moodle-net:
+    driver: bridge

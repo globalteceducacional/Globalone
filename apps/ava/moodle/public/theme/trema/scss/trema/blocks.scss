@@ -1,0 +1,119 @@
+#page .block {
+    border: none;
+    border-top: 2px solid $primary;
+}
+
+//Admin Blocks
+#side-admin-blocks {
+    width: 100%;
+    background: rgba($primary, 0.2);
+
+    #block-region-side-admin {
+        min-height: 150px;
+        height: 100%;
+        width: 100%;
+    }
+    .card {
+        border-top-color: $primary;
+    }
+}
+
+#region-main.has-blocks .dashboard-card-deck .dashboard-card {
+    box-shadow: 0 0 7px #a3a5ae;
+    transition: all ease-in 300ms;
+    &:hover {
+        box-shadow: 0 0 3px #bbbdc7;
+    }
+}
+
+.block_myoverview.block {
+    background: $white;
+    padding: 1rem;
+
+    .dashboard-card {
+        box-shadow: 1px 0 11px #a5a5a5;
+        margin: 1rem;
+
+        .card-body {
+            border-top: 1px solid #d4d4d4;
+        }
+    }
+
+    #searchinput {
+        height: 2.8rem;
+        text-transform: $text-transform;
+    }
+    button.btn {
+        margin: 0;
+    }
+
+    .dashboard-card-deck .dashboard-card .dashboard-card-img {
+        height: auto;
+        aspect-ratio: 7 / 4;
+    }
+
+    .dashboard-card-deck:not(.fixed-width-cards) .dashboard-card {
+        @media (min-width: 580px) {
+            width: calc(50% - 2rem);
+        }
+        @media (min-width: 840px) {
+            width: calc(33.33% - 2rem);
+        }
+        @media (min-width: 1200px) {
+            width: calc(25% - 2rem);
+        }
+    }
+
+    // Auto-fill course card grid (Moodle 4.4+ markup).
+    .card-grid {
+        &.row {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)) !important;
+            gap: 20px;
+            > .col {
+                max-width: none;
+                width: 100%;
+                min-width: 0;
+            }
+        }
+        .card {
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            contain: paint;
+            @media (min-width: 992px) {
+                .card-img-top {
+                    aspect-ratio: 7 / 4;
+                    height: auto;
+                }
+            }
+            // Honour reduced-motion preference (WCAG 2.3.3) and skip touch devices.
+            @media (hover: hover) and (prefers-reduced-motion: no-preference) {
+                &.course-card:hover .card-img-top {
+                    transform: scale(1.1);
+                    transition: transform 0.3s ease-in;
+                }
+                .card-img-top {
+                    transition: transform 0.3s ease-out;
+                }
+            }
+        }
+    }
+}
+.block_myoverview .summary-image {
+    height: auto;
+    width: 100%;
+    aspect-ratio: 7 / 4;
+}
+
+#page .course-card-view {
+    @media (min-width: 580px) {
+        max-width: calc(50% - 2rem);
+    }
+    @media (min-width: 840px) {
+        max-width: calc(33.33% - 2rem);
+    }
+    @media (min-width: 1200px) {
+        max-width: calc(25% - 2rem);
+    }
+}

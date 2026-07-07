@@ -1,0 +1,406 @@
+// Auto-select colours, usually the foreground based on the background colour.
+$header-color: choose-contrast-color($header-bg-color);
+$footer-color: choose-contrast-color($footer-bg-color);
+$highlight-color: choose-contrast-color($highlight-background-color);
+
+$nav-color: choose-contrast-color($header-bg-color);
+$body-color: choose-contrast-color($body-bg-color);
+$editmodeon-color: choose-contrast-color($editmodeon-bg-color);
+$dropdown-color: choose-contrast-color($dropdown-bg-color);
+$drawer-color: choose-contrast-color($drawer-bg-color);
+
+.card:not(.fp-navbar) {
+    border: none;
+}
+
+a:focus,
+.aalink.focus,
+.aalink:focus,
+.aabtn.focus,
+.aabtn:focus,
+a.focus.autolink,
+a.autolink:focus,
+a:not([class]).focus,
+a:not([class]):focus,
+.activityinstance > a.focus,
+.activityinstance > a:focus,
+.arrow_link.focus,
+.arrow_link:focus,
+a.dropdown-toggle.focus,
+a.dropdown-toggle:focus,
+body #page button.btn-secondary:focus,
+body #page .btn.btn-secondary:focus,
+.btn:focus,
+.btn-link.focus,
+.btn-link:focus,
+.btn-primary:focus,
+.btn-secondary:focus,
+.btn-secondary.focus,
+button.close.focus,
+button.close:focus,
+button.btn-close.focus,
+button.btn-close:focus,
+.custom-control-input,
+.custom-select:focus,
+.form-select:focus,
+.drawer-toggles .drawer-toggler .btn:focus,
+.editor_atto_toolbar button.focus,
+.editor_atto_toolbar button:focus,
+.editor_atto_toolbar .atto_toolbar_row.focus,
+.editor_atto_toolbar .atto_toolbar_row:focus,
+[role="button"].focus,
+[role="button"]:focus,
+.form-autocomplete-selection.focus,
+.form-autocomplete-selection:focus,
+.form-control:focus,
+input[type="checkbox"].focus,
+input[type="checkbox"]:focus,
+input[type="radio"].focus,
+input[type="radio"]:focus,
+input[type="file"].focus,
+input[type="file"]:focus,
+input[type="image"].focus,
+input[type="image"]:focus,
+body #page input[type="submit"].btn-secondary:focus,
+body #page input[type="reset"].btn-secondary:focus,
+body #page input[type="button"].btn-secondary:focus,
+.list-group-item-action.focus,
+.list-group-item-action:focus,
+.moodle-dialogue-base .closebutton.focus,
+.moodle-dialogue-base .closebutton:focus,
+.nav-link.focus,
+.nav-link:focus,
+#page-footer a:not([class]).focus,
+#page-footer a:not([class]):focus,
+[role="treeitem"]:not([aria-expanded="true"]).focus,
+[role="treeitem"]:not([aria-expanded="true"]):focus,
+.sr-only-focusable.focus,
+.sr-only-focusable:focus,
+.visually-hidden-focusable.focus,
+.visually-hidden-focusable:focus,
+.carousel-control-prev-icon:focus,
+.carousel-control-next-icon:focus,
+select.focus {
+    // Works on both dark and light backgrounds.
+    outline: 2px #f9f9f9 solid;
+    outline-offset: 0;
+    box-shadow: 0 0 3px 3px $primary;
+    transition: box-shadow 0.3s ease;
+}
+
+// Improve colour contrast ratio for input placeholder text.
+::placeholder {
+    color: $placeholder-color !important;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: $body-font-family;
+    a {
+        color: fix-color-contrast($primary);
+    }
+}
+
+:target {
+    scroll-margin-top: 50px;
+}
+
+// Allow text to wrap in table cells.
+td,
+th {
+    white-space: normal;
+}
+
+%border-frequency {
+    position: relative;
+
+    &:before {
+        content: '';
+        background-color: rgba(144, 144, 144, 0.35);
+        display: block;
+        height: 3rem;
+        position: absolute;
+        right: 50%;
+        top: -3rem;
+        width: 1px;
+    }
+
+    &:after {
+        content: '';
+        background: linear-gradient(to right, $primary 50%, $secondary 50%);
+        top: 0;
+        display: block;
+        height: 0.25rem;
+        position: absolute;
+        right: 0;
+        width: 100%;
+    }
+}
+
+%dot-style-after {
+    background-color: $primary;
+    content: '';
+    height: 6px;
+    position: absolute;
+    left: 0;
+    bottom: -3px;
+    width: 6px;
+}
+
+.border-trema {
+    @extend %border-frequency;
+}
+
+body {
+    -webkit-font-smoothing: antialiased;
+    background: $body-bg-color;
+
+    #region-main-box.row {
+        margin: 0;
+    }
+
+    #region-main {
+        border: none;
+    }
+
+    #page.drawers {
+        div[role='main'] {
+            padding: 0;
+        }
+    }
+
+    #page {
+        margin-top: 4em;
+        padding-top: 1.5em;
+
+        #topofscroll {
+            background-color: transparent;
+            padding-top: 0;
+        }
+
+        #page-header {
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+            width: 100%;
+            max-width: $course-content-maxwidth;
+            padding: 0;
+            .breadcrumb {
+                &:not(:empty) .breadcrumb-item {
+                    flex-grow: 0;
+                }
+                &,
+                a,
+                a:hover,
+                a:focus,
+                a:active,
+                &::before {
+                    color: choose-contrast-color($body-bg-color);
+                }
+            }
+        }
+
+        .secondary-navigation {
+            padding: 0;
+            width: 100%;
+            .navigation {
+                margin: 0;
+            }
+        }
+
+        #page-content {
+            max-width: $course-content-maxwidth;
+            width: 100%;
+            margin: 1rem auto;
+        }
+
+        .atto_group button {
+            color: #000;
+            background-color: #fff;
+            padding: 4px 9px;
+            margin: 0;
+            height: 30px;
+        }
+
+        #page-header .card {
+            @extend %border-frequency;
+        }
+
+        a:not(.dropdown-item,.btn) {
+            color: fix-color-contrast($primary);
+            text-decoration: $links-decoration;
+            font-weight: normal;
+
+            &:hover {
+                color: darken($primary, 30%);
+                text-decoration: underline;
+            }
+
+            &.dropdown-toggle:hover {
+                text-decoration: none;
+            }
+        }
+
+        a.dropdown-item,
+        a.btn,
+        a.aabtn,
+        a.btn-icon {
+            text-decoration: none;
+            &:hover {
+                text-decoration: none;
+            }
+        }
+
+        .tab-pane .nav-link.active {
+            color: $white;
+        }
+
+        #assignform #existingcell {
+            width: 42%;
+        }
+
+        [data-filterregion='filter'] {
+            .btn[data-filteraction='remove'] {
+                background-color: $white;
+            }
+        }
+
+        [class*="alert-"] {
+            color: $black;
+        }
+
+        [class*="alert-"] a,
+        .btn-link {
+            text-decoration: underline;
+            color: #005ad8;
+        }
+    }
+
+    &#page-user-profile {
+        #region-main-box {
+            padding: 0;
+        }
+    }
+
+    .dropdown-menu {
+        background-color: $gray-100;
+    }
+}
+
+// Rounded user pictures
+.userpicture {
+    border-radius: 50%;
+}
+
+.message-app.drawer,
+.message-drawer,
+[data-region='right-hand-drawer'].drawer {
+    top: 4em;
+    height: calc(100% - 4em);
+}
+
+body#page-user-profile {
+    #message-user-button {
+        appearance: none;
+        background-color: transparent;
+        color: $primary;
+        height: auto;
+        margin: 0 0.5rem;
+        padding: 0 0.9rem;
+        text-transform: none;
+
+        &:hover {
+            color: darken($primary, 20%);
+        }
+    }
+}
+
+body#page-calendar-view {
+    #page-content:before {
+        content: none;
+    }
+    .maincalendar .select.custom-select.cal_courses_flt,
+    .maincalendar .select.form-select.cal_courses_flt {
+        margin: 0.5rem;
+    }
+}
+.maincalendar .calendarmonth td.today .day-number-circle {
+    border: 1px solid choose-contrast-color($primary);
+    .day-number {
+        color: choose-contrast-color($primary);
+    }
+}
+
+body.format-site.path-course,
+body.format-site.path-report,
+body.format-site.path-question,
+body#page-contentbank,
+body.format-site.path-filter,
+body.format-site.path-backup,
+body.format-site.path-calendar {
+    .secondary-navigation {
+        padding: 0;
+        width: calc(100% - 6rem);
+        margin: 0 auto;
+        max-width: $course-content-maxwidth;
+    }
+
+    #page-content {
+        @extend %border-frequency;
+        &:before {
+            height: 1rem;
+            top: -1rem;
+        }
+        &:after {
+            height: 0.15rem;
+        }
+
+        #region-main-box {
+            padding: 0;
+
+            #region-main {
+                padding: 2rem;
+                background-color: $white;
+            }
+        }
+    }
+}
+
+body#page-contentbank {
+    .secondary-navigation {
+        width: 100%;
+    }
+
+    .searchbar .input-group-append .input-group-text,
+    .searchbar > .input-group-text {
+        padding: 0;
+        .search-icon .btn {
+            height: calc(1.5em + 0.75rem + 2px);
+            margin: 0;
+            width: 40px;
+            > span.d-flex {
+                justify-content: center;
+            }
+        }
+    }
+}
+
+.dimmed {
+    opacity: .50;
+}
+
+.page-context-header {
+    align-items: center;
+    h1 {
+        font-size: calc(0.9975rem + 1.17vw);
+        margin: 0;
+    }
+}
+
+@media (max-width: 1200px) {
+    body #page h1 {
+        font-size: calc(0.9975rem + 1.17vw);
+    }
+}

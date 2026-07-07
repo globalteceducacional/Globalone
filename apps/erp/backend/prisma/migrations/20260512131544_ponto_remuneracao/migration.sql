@@ -1,0 +1,2 @@
+-- RenameIndex
+ALTER INDEX "BancoHorasReaberturaDesafio_adminId_usuarioAlvoId_competencia_u" RENAME TO "BancoHorasReaberturaDesafio_adminId_usuarioAlvoId_competenc_idx";
