@@ -1,5 +1,94 @@
 /* G.One — ajustes de responsividade mobile/tablet */
 
+/* ── Repositório: imagens contidas no card ── */
+.tech-card {
+  overflow: hidden;
+}
+
+.tech-card .tech-img {
+  height: 210px;
+  max-height: 210px;
+  min-height: 210px;
+  overflow: hidden;
+  flex-shrink: 0;
+  position: relative;
+  isolation: isolate;
+}
+
+.tech-card .tech-img img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  object-position: center;
+}
+
+.tech-card .body {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  min-width: 0;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.tech-card.repo-highlight::before {
+  display: inline-flex;
+  margin: 12px 12px 0;
+}
+
+.feature-card .media {
+  aspect-ratio: 16 / 9;
+  max-height: 220px;
+  overflow: hidden;
+  background: #0a1412;
+}
+
+.feature-card .media img,
+.feature-card .media video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-height: 220px;
+  object-fit: contain;
+}
+
+/* ── Espaçamento entre botões e tags ── */
+.actions {
+  gap: 12px !important;
+  row-gap: 12px !important;
+}
+
+.tech-card .toolbar,
+.card .toolbar {
+  gap: 8px;
+  row-gap: 8px;
+  margin-bottom: 4px;
+}
+
+.card .actions {
+  margin-top: 14px;
+}
+
+/* ── Vídeos: sem botões Reiniciar / Play-Pausar extras ── */
+.hero-video-tools,
+.video-play-overlay {
+  display: none !important;
+}
+
+/* ── Onboarding: só os pontos, sem barra de progresso ── */
+.onboard-copy .progress {
+  display: none !important;
+}
+
+.onboard-copy .dots {
+  margin-bottom: 12px;
+}
+
 @media (max-width: 1180px) {
   .main {
     padding: 16px;
@@ -49,13 +138,37 @@
   .onboard-copy .actions {
     display: grid;
     grid-template-columns: 1fr;
-    gap: 8px;
-    margin-top: 12px;
+    gap: 12px;
+    margin-top: 16px;
   }
 
   .onboard-copy .actions .btn {
     width: 100%;
-    min-height: 44px;
+    min-height: 46px;
+  }
+
+  .tech-card .body .actions,
+  .feature-card .actions,
+  .card .actions {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px !important;
+  }
+
+  .tech-card .body .actions .btn,
+  .tech-card .body .actions a.btn,
+  .feature-card .actions .btn,
+  .card .actions .btn,
+  .card .actions a.btn {
+    width: 100%;
+    flex: none;
+    margin: 0;
+  }
+
+  .tech-card .tech-img {
+    height: 190px;
+    max-height: 190px;
+    min-height: 190px;
   }
 
   .onboard-copy label {
